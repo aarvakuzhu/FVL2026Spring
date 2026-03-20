@@ -37,8 +37,19 @@ function timeStr(minsFrom830) {
   return `${hh}:${String(m).padStart(2,'0')}${ap}`;
 }
 
-function shuffle(arr) {
-  const a = [...arr];
+// Deterministic coin flip — same two tied teams always resolve the same way.
+// Uses a hash of both team names so the result is stable across re-renders
+// but appears random to participants.
+function coinFlip(nameA, nameB) {
+  const str = [nameA, nameB].sort().join('|');
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  }
+  return (h & 1) ? 1 : -1;
+}
+
+function shuffle(arr) {  const a = [...arr];
   for (let i = a.length-1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i+1));
     [a[i],a[j]] = [a[j],a[i]];
@@ -153,7 +164,7 @@ function computePoolStandings(poolTeams, poolTag, schedule, gameScores) {
     if (hS > aS) { stats[g.home].w++; stats[g.away].l++; }
     else if (aS > hS) { stats[g.away].w++; stats[g.home].l++; }
   });
-  return Object.values(stats).sort((a,b) => (b.w-a.w) || ((b.pf-b.pa)-(a.pf-a.pa)) || b.pf-a.pf);
+  return Object.values(stats).sort((a,b) => (b.w-a.w) || ((b.pf-b.pa)-(a.pf-a.pa)) || b.pf-a.pf || coinFlip(a.name,b.name));
 }
 
 function computeWildcardStandings(div, pools, schedule, gameScores) {
@@ -193,7 +204,7 @@ function computeWildcardStandings(div, pools, schedule, gameScores) {
   if (pool1St.length) autoQual.add(pool1St[0].name);
   if (pool2St.length) autoQual.add(pool2St[0].name);
 
-  const sorted = Object.values(stats).sort((a,b) => (b.w-a.w)||((b.pf-b.pa)-(a.pf-a.pa))||b.pf-a.pf);
+  const sorted = Object.values(stats).sort((a,b) => (b.w-a.w)||((b.pf-b.pa)-(a.pf-a.pa))||b.pf-a.pf||coinFlip(a.name,b.name));
   const eligible = sorted.filter(t => !autoQual.has(t.name));
   const wildcards = new Set(eligible.slice(0,2).map(t=>t.name));
   return { sorted, autoQual, wildcards };
