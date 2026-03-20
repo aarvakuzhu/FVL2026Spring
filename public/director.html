@@ -625,10 +625,13 @@ function renderSchedule(filter) {
   ];
   let html = '';
   for (const ph of phases) {
+    // If filtering by a specific phase, skip the other phase entirely
+    if (filter==='p1' && ph.id!=='p1') continue;
+    if (filter==='p2' && ph.id!=='p2') continue;
+
     let games = sorted.filter(g => g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
     if (filter==='c1') games = sorted.filter(g=>(g.phase===ph.id&&g.court===1)||(ph.id==='p1'&&g.phase==='break'));
     else if (filter==='c2') games = sorted.filter(g=>(g.phase===ph.id&&g.court===2)||(ph.id==='p1'&&g.phase==='break'));
-    else if (filter===ph.id) games = sorted.filter(g=>g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
     // Apply team filter
     if (activeTeamFilter) {
       games = games.filter(g => g.isBreak || g.home===activeTeamFilter || g.away===activeTeamFilter);
