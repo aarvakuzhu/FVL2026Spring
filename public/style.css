@@ -494,4 +494,121 @@ body.light .wc-cutline-label{color:var(--muted)}
 .m-score-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--surface2);border-radius:var(--r);border:1px solid var(--border)}
 .m-score-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
 .m-score-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);font-weight:500}
-</style>
+
+/* ═══════════════════════════════════════════════════
+   FONT SCALE — bumps all text to mobile-readable sizes
+   ═══════════════════════════════════════════════════ */
+
+/* Base */
+body { font-size: 15px; }
+
+/* Hero */
+.logo-eyebrow { font-size: 11px; }
+.logo-sub { font-size: 11px; }
+.hero-meta { font-size: 11px; }
+.div-pill { font-size: 13px; }
+.step-tab { font-size: 11px; }
+.theme-toggle { font-size: 11px; }
+
+/* Buttons & inputs */
+.btn { font-size: 13px; }
+input[type="text"] { font-size: 13px; }
+.fbtn { font-size: 11px; padding: 5px 11px; }
+.match-count { font-size: 11px; }
+
+/* Teams step */
+.team-num { font-size: 11px; }
+.div-tag { font-size: 10px; }
+.field-hint { font-size: 10px; }
+
+/* Draw */
+.conf-name { font-size: 17px; }
+.conf-sub { font-size: 11px; }
+.pool-name { font-size: 13px; }
+.pt-name { font-size: 13px; }
+.pt-cap { font-size: 11px; }
+
+/* Schedule mode cards */
+.mode-badge { font-size: 12px; }
+.mode-title { font-size: 13px; }
+.mode-desc { font-size: 11px; }
+.s-lbl { font-size: 10px; }
+
+/* Schedule game rows — most important for players */
+.gr-time { font-size: 12px; }
+.gr-court { font-size: 10px; }
+.gr-home { font-size: 14px; }
+.gr-away { font-size: 14px; }
+.gr-vs { font-size: 11px; }
+.gr-tag { font-size: 10px; }
+.cap-home { font-size: 11px; }
+.cap-away { font-size: 11px; }
+.diff-badge { font-size: 11px; }
+.phase-badge { font-size: 13px; }
+.phase-title { font-size: 14px; }
+.phase-time { font-size: 11px; }
+.break-icon { font-size: 12px; }
+.break-label { font-size: 12px; }
+.break-time { font-size: 11px; }
+
+/* Standings */
+.standing-pool-name { font-size: 15px; }
+.standing-sub { font-size: 11px; }
+.st-table th { font-size: 10px; }
+.st-table td { font-size: 12px; }
+.st-table td.left { font-size: 13px; }
+.st-table td.cap { font-size: 11px; }
+.st-table td.pos { font-size: 16px; }
+.qual-badge { font-size: 10px; }
+
+/* Wildcard */
+.wc-section-sub { font-size: 11px; }
+.wc-conf-name { font-size: 16px; }
+.wc-conf-note { font-size: 10px; }
+.wc-team-name { font-size: 13px; }
+.wc-captain { font-size: 11px; }
+.wc-status-tag { font-size: 10px; }
+.wc-record { font-size: 18px; }
+.wc-diff { font-size: 11px; }
+.wc-divider { font-size: 10px; }
+.wc-leg-item { font-size: 11px; }
+.wc-cutline-label { font-size: 10px; }
+
+/* Bracket */
+.bracket-conf-name { font-size: 15px; }
+.bracket-conf-sub { font-size: 11px; }
+.bg-seed { font-size: 14px; }
+.bg-team-name { font-size: 14px; }
+.bg-team-cap { font-size: 11px; }
+.bg-score-val { font-size: 15px; }
+.bg-tag { font-size: 10px; }
+.bg-time-court { font-size: 11px; }
+.bg-diff { font-size: 11px; }
+
+/* SuperVolley card */
+.sv-eyebrow { font-size: 10px; }
+.sv-trophy { font-size: 12px; }
+.sv-court { font-size: 11px; }
+.sv-conf-tag { font-size: 10px; }
+.sv-team-name { font-size: 18px; }
+.sv-team-cap { font-size: 11px; }
+.sv-div { font-size: 11px; }
+.sv-diff { font-size: 12px; }
+
+/* Modal */
+.modal-eyebrow { font-size: 10px; }
+.m-section-title { font-size: 15px; }
+.m-phase-num { font-size: 15px; }
+.m-phase-name { font-size: 14px; }
+.m-phase-desc { font-size: 12px; }
+.m-phase-time { font-size: 11px; }
+.m-gbox-lbl { font-size: 10px; }
+.m-gbox-teams { font-size: 11px; }
+.m-rule { font-size: 12px; }
+.m-conf-name { font-size: 15px; }
+.m-conf-pools { font-size: 11px; }
+.m-score-key { font-size: 12px; }
+.m-score-val { font-size: 12px; }
+
+/* Toast */
+.toast { font-size: 13px; }
