@@ -784,46 +784,93 @@ body::after {
 <!-- RULES -->
 <div class="screen" id="screen-rules">
   <div class="rules-wrap">
+
+    <div class="rules-block">
+      <div class="rules-block-title">Conferences</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="rules-panel" style="padding:12px 14px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--avc);margin-bottom:4px">AVC</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6">American Volleyball Conference<br>Fowler Pool · Central Pool<br>8 teams total</div>
+        </div>
+        <div class="rules-panel" style="padding:12px 14px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--nvc);margin-bottom:4px">NVC</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6">National Volleyball Conference<br>Dobbs Pool · Extreme Pool<br>8 teams total</div>
+        </div>
+      </div>
+    </div>
+
     <div class="rules-block">
       <div class="rules-block-title">Tournament Phases</div>
       <div class="rules-panel">
         <div class="phase-row">
           <div class="phase-top"><div class="phase-circle">1</div><div class="phase-pname">Qualifiers — Pool Play</div><div class="phase-time-badge">8:30–1:30</div></div>
-          <div class="phase-desc">Full round-robin in your pool. Pool winner auto-qualifies for the bracket.</div>
+          <div class="phase-desc">Full round-robin within your pool — every team plays all 3 opponents. Pool winner automatically qualifies for the division bracket. No elimination in this phase.</div>
         </div>
         <div class="phase-row">
           <div class="phase-top"><div class="phase-circle">2</div><div class="phase-pname">Wildcard Round</div><div class="phase-time-badge">1:30–3:20</div></div>
-          <div class="phase-desc">1 cross-pool game. Top 2 non-qualifiers per division earn wildcard spots.</div>
+          <div class="phase-desc">All 16 teams play 1 randomly drawn cross-pool game within their division. Top 2 non-qualified teams per division (by combined Phase 1 + Phase 2 record) earn wildcard spots into the bracket.</div>
         </div>
         <div class="phase-row">
           <div class="phase-top"><div class="phase-circle">3</div><div class="phase-pname">Division Brackets</div><div class="phase-time-badge">3:20–4:55</div></div>
-          <div class="phase-desc">4 teams seeded 1–4 by combined record. SF (1v4, 2v3) → Final.</div>
+          <div class="phase-desc">4 teams per division — 2 auto-qualified + 2 wildcards. Seeded 1–4 by combined record. Seed 1 vs Seed 4 · Seed 2 vs Seed 3. Division Final decides the conference champion. Both brackets run simultaneously.</div>
         </div>
         <div class="phase-row">
           <div class="phase-top"><div class="phase-circle star">★</div><div class="phase-pname">SuperVolley Final</div><div class="phase-time-badge">4:55–5:20</div></div>
-          <div class="phase-desc">AVC Champion vs NVC Champion. Champion of Champions.</div>
+          <div class="phase-desc">AVC Champion vs NVC Champion. One game. Champion of Champions crowned.</div>
         </div>
       </div>
     </div>
+
     <div class="rules-block">
       <div class="rules-block-title">Games Per Team</div>
       <div class="games-row">
-        <div class="games-box"><div class="games-num" style="color:var(--text4)">4</div><div class="games-lbl">Didn't qualify</div></div>
-        <div class="games-box"><div class="games-num" style="color:var(--nvc)">5</div><div class="games-lbl">SF exit</div></div>
-        <div class="games-box"><div class="games-num" style="color:var(--avc)">6</div><div class="games-lbl">Div final exit</div></div>
-        <div class="games-box"><div class="games-num" style="color:var(--blue)">7</div><div class="games-lbl">Finalist</div></div>
+        <div class="games-box"><div class="games-num" style="color:var(--text4)">4</div><div class="games-lbl">Did not qualify<br><span style="color:var(--text3)">8 teams</span></div></div>
+        <div class="games-box"><div class="games-num" style="color:var(--nvc)">5</div><div class="games-lbl">SF exit<br><span style="color:var(--text3)">4 teams</span></div></div>
+        <div class="games-box"><div class="games-num" style="color:var(--avc)">6</div><div class="games-lbl">Div final exit<br><span style="color:var(--text3)">2 teams</span></div></div>
+        <div class="games-box"><div class="games-num" style="color:var(--blue)">7</div><div class="games-lbl">SV finalists<br><span style="color:var(--text3)">2 teams</span></div></div>
       </div>
     </div>
+
     <div class="rules-block">
-      <div class="rules-block-title">Scoring Rules</div>
+      <div class="rules-block-title">Wildcard Qualification</div>
       <div class="rules-panel">
-        <div class="rules-row"><span class="rules-key">Win condition</span><span class="rules-val">First to 21</span></div>
-        <div class="rules-row"><span class="rules-key">Deuce at 20–20</span><span class="rules-val">Win by 2</span></div>
-        <div class="rules-row"><span class="rules-key">Hard cap</span><span class="rules-val">25 wins outright</span></div>
-        <div class="rules-row"><span class="rules-key">Duration</span><span class="rules-val">~25 min · ends by points</span></div>
-        <div class="rules-row"><span class="rules-key">Break</span><span class="rules-val">11:00–11:10</span></div>
+        <div class="rules-row"><span class="rules-key">Ranking basis</span><span class="rules-val">Combined Phase 1 + Phase 2 record</span></div>
+        <div class="rules-row"><span class="rules-key">Pool winners</span><span class="rules-val">Already qualified — excluded from race</span></div>
+        <div class="rules-row"><span class="rules-key">Tiebreaker 1</span><span class="rules-val">Point differential (PF − PA)</span></div>
+        <div class="rules-row"><span class="rules-key">Tiebreaker 2</span><span class="rules-val">Total points scored</span></div>
+        <div class="rules-row"><span class="rules-key">Final tiebreaker</span><span class="rules-val">Coin flip (deterministic)</span></div>
       </div>
     </div>
+
+    <div class="rules-block">
+      <div class="rules-block-title">Bracket Seeding</div>
+      <div class="rules-panel">
+        <div class="rules-row"><span class="rules-key">Method</span><span class="rules-val">All 4 teams ranked by combined record</span></div>
+        <div class="rules-row"><span class="rules-key">Note</span><span class="rules-val">Pool winners can be seeded 3 or 4</span></div>
+        <div class="rules-row"><span class="rules-key">Semis</span><span class="rules-val">Seed 1 vs 4 · Seed 2 vs 3</span></div>
+      </div>
+    </div>
+
+    <div class="rules-block">
+      <div class="rules-block-title">Volleyball Scoring</div>
+      <div class="rules-panel">
+        <div class="rules-row"><span class="rules-key">Scoring</span><span class="rules-val">Rally — every serve scores</span></div>
+        <div class="rules-row"><span class="rules-key">Win condition</span><span class="rules-val">First to 21 points</span></div>
+        <div class="rules-row"><span class="rules-key">Deuce at 20–20</span><span class="rules-val">Must win by 2</span></div>
+        <div class="rules-row"><span class="rules-key">Hard cap</span><span class="rules-val">25 pts — first to 25 wins outright</span></div>
+        <div class="rules-row"><span class="rules-key">Duration</span><span class="rules-val">~25 min · ends by points only</span></div>
+      </div>
+    </div>
+
+    <div class="rules-block">
+      <div class="rules-block-title">Scheduled Break</div>
+      <div class="rules-panel">
+        <div class="rules-row"><span class="rules-key">Time</span><span class="rules-val">11:00am – 11:10am</span></div>
+        <div class="rules-row"><span class="rules-key">Both courts</span><span class="rules-val">Stand down simultaneously</span></div>
+        <div class="rules-row"><span class="rules-key">Resume</span><span class="rules-val">11:10am sharp</span></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
