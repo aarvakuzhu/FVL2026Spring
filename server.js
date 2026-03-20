@@ -61,14 +61,24 @@ function authMiddleware(req, res, next) {
 
 // ── ROUTES ─────────────────────────────────────────────
 
-// Player view (read-only)
+// Player view (read-only) — original
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'player.html'));
 });
 
-// Director view
+// New player view — v2 design
+app.get('/players', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'players.html'));
+});
+
+// Director view — original
 app.get('/director', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'director.html'));
+});
+
+// New director view — v2 design
+app.get('/td', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'td.html'));
 });
 
 // Login

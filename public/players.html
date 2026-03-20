@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SuperVolley · FVL 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ── SYSTEM THEME ── */
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f7;
+  --bg3: #e8e8ed;
+  --card: #ffffff;
+  --border: #e5e5ea;
+  --text: #1c1c1e;
+  --text2: #636366;
+  --text3: #aeaeb2;
+  --blue: #2563EB;
+  --blue-bg: #eff6ff;
+  --blue-dim: #bfdbfe;
+  --win: #16a34a;
+  --win-bg: #f0fdf4;
+  --lose: #9ca3af;
+  --avc: #d97706;
+  --avc-bg: #fffbeb;
+  --nvc: #0891b2;
+  --nvc-bg: #ecfeff;
+  --r: 12px;
+  --r2: 16px;
+  --r3: 20px;
+  --nav-h: 64px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --bg2: #1c1c1e;
+    --bg3: #2c2c2e;
+    --card: #1c1c1e;
+    --border: #3a3a3c;
+    --text: #ffffff;
+    --text2: #ebebf5cc;
+    --text3: #ebebf560;
+    --blue: #3b82f6;
+    --blue-bg: #1e3a5f;
+    --blue-dim: #1d4ed8;
+    --win: #4ade80;
+    --win-bg: #052e16;
+    --lose: #6b7280;
+    --avc: #fbbf24;
+    --avc-bg: #1c1400;
+    --nvc: #22d3ee;
+    --nvc-bg: #001a1f;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px;
+  min-height: 100%;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+
+/* ── HEADER ── */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.header-left { display: flex; flex-direction: column; gap: 1px; }
+.app-name { font-size: 20px; font-weight: 800; letter-spacing: -.4px; color: var(--text); }
+.app-sub { font-size: 12px; color: var(--text3); font-weight: 500; }
+.live-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--win-bg); border: 1px solid var(--win);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 12px; font-weight: 600; color: var(--win);
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--win); animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  background: none; border: none; cursor: pointer;
+  padding: 8px 0 4px;
+  color: var(--text3); transition: color .15s;
+}
+.nav-btn.active { color: var(--blue); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 16px; }
+.screen.active { display: block; }
+
+/* ── SECTION HEADER ── */
+.section-hdr {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 14px;
+}
+.section-title { font-size: 22px; font-weight: 800; letter-spacing: -.4px; }
+.section-sub { font-size: 13px; color: var(--text3); font-weight: 500; }
+
+/* ── TEAM PICKER ── */
+.team-picker-wrap { margin-bottom: 16px; }
+.team-picker {
+  width: 100%; background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 11px 14px;
+  font-size: 15px; font-weight: 500; color: var(--text);
+  font-family: inherit; outline: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+.team-picker:focus { border-color: var(--blue); }
+
+/* ── GAME CARD ── */
+.phase-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text3);
+  margin: 20px 0 8px;
+}
+.phase-label:first-child { margin-top: 0; }
+.game-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r2); margin-bottom: 10px; overflow: hidden;
+  transition: border-color .15s;
+}
+.game-card.has-result { border-color: var(--border); }
+.game-card-inner { padding: 14px 16px; }
+.game-meta {
+  display: flex; gap: 6px; align-items: center;
+  margin-bottom: 12px;
+}
+.game-time { font-size: 12px; font-weight: 600; color: var(--text3); }
+.game-court {
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 6px;
+}
+.court-1 { background: var(--avc-bg); color: var(--avc); }
+.court-2 { background: var(--nvc-bg); color: var(--nvc); }
+.game-tag { font-size: 11px; color: var(--text3); margin-left: auto; }
+.game-matchup { display: flex; flex-direction: column; gap: 6px; }
+.game-team-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.team-name {
+  flex: 1; font-size: 16px; font-weight: 700; color: var(--text);
+  letter-spacing: -.2px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.team-name.winner { color: var(--blue); }
+.team-name.loser { color: var(--text3); font-weight: 500; }
+.team-score {
+  font-size: 28px; font-weight: 800; color: var(--text);
+  letter-spacing: -.5px; min-width: 42px; text-align: right;
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.team-score.winner { color: var(--blue); }
+.team-score.loser { color: var(--text3); font-weight: 600; }
+.team-score.pending { color: var(--text3); font-size: 22px; }
+.game-divider {
+  height: 1px; background: var(--border); margin: 0 16px;
+}
+.game-footer {
+  padding: 8px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.captain-names { font-size: 11px; color: var(--text3); }
+.diff-chip {
+  font-size: 12px; font-weight: 700; color: var(--blue);
+  background: var(--blue-bg); border-radius: 8px; padding: 2px 8px;
+}
+
+/* Break card */
+.break-card {
+  background: var(--bg2); border: 1.5px dashed var(--border);
+  border-radius: var(--r2); padding: 12px 16px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.break-icon { font-size: 18px; }
+.break-text { font-size: 13px; font-weight: 600; color: var(--text2); }
+.break-time { font-size: 12px; color: var(--text3); margin-left: auto; }
+
+/* Empty */
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 18px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.empty-body { font-size: 14px; line-height: 1.5; }
+
+/* ── STANDINGS ── */
+.standings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pool-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+}
+.pool-card-hdr {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pool-card-name { font-size: 14px; font-weight: 700; }
+.pool-card-conf { font-size: 11px; font-weight: 600; color: var(--text3); }
+.pool-row {
+  display: flex; align-items: center; gap: 0;
+  padding: 9px 14px; border-bottom: 1px solid var(--border);
+}
+.pool-row:last-child { border-bottom: none; }
+.pool-row.top { background: var(--blue-bg); }
+.pool-rank {
+  font-size: 16px; font-weight: 800; color: var(--text3);
+  width: 22px; flex-shrink: 0;
+}
+.pool-row.top .pool-rank { color: var(--blue); }
+.pool-info { flex: 1; min-width: 0; }
+.pool-team { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pool-row.top .pool-team { color: var(--blue); }
+.pool-cap { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pool-wl { font-size: 13px; font-weight: 700; color: var(--text); text-align: right; flex-shrink: 0; }
+.pool-row.top .pool-wl { color: var(--blue); }
+.pool-diff { font-size: 11px; color: var(--text3); text-align: right; flex-shrink: 0; min-width: 32px; }
+.auto-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .06em;
+  background: var(--blue); color: #fff; border-radius: 4px;
+  padding: 1px 4px; margin-left: 4px; vertical-align: middle;
+}
+
+/* ── WILDCARD ── */
+.wc-conf-block { margin-bottom: 20px; }
+.wc-conf-title {
+  font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
+}
+.wc-qualified-banner {
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 10px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.wc-q-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; }
+.wc-q-teams { font-size: 13px; font-weight: 600; color: var(--text); }
+.wc-race-label {
+  font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase;
+  letter-spacing: .06em; padding: 8px 0 6px;
+  display: flex; justify-content: space-between;
+}
+.wc-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r2); margin-bottom: 6px; overflow: hidden;
+}
+.wc-card.spot { border-color: var(--blue); }
+.wc-card-inner {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+}
+.wc-pos {
+  font-size: 24px; font-weight: 800; color: var(--text3);
+  width: 28px; flex-shrink: 0; text-align: center;
+}
+.wc-card.spot .wc-pos { color: var(--blue); }
+.wc-info { flex: 1; min-width: 0; }
+.wc-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wc-card.spot .wc-name { color: var(--blue); }
+.wc-cap { font-size: 12px; color: var(--text3); }
+.wc-stats { text-align: right; flex-shrink: 0; }
+.wc-wl { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -.3px; }
+.wc-card.spot .wc-wl { color: var(--blue); }
+.wc-pdiff { font-size: 12px; color: var(--text3); }
+.wc-spot-badge {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; padding: 2px 7px; border-radius: 6px; margin-top: 3px;
+  display: inline-block;
+}
+.wc-spot-badge.wc { background: var(--blue-bg); color: var(--blue); }
+.wc-spot-badge.out { background: var(--bg2); color: var(--text3); }
+.cutline-bar {
+  display: flex; align-items: center; gap: 8px; padding: 4px 0; margin: 2px 0;
+}
+.cutline-line { flex: 1; height: 1px; background: var(--border); }
+.cutline-txt { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
+
+/* ── BRACKET ── */
+.bracket-conf { margin-bottom: 24px; }
+.bracket-conf-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.bracket-conf-name { font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
+.bracket-conf-sub { font-size: 12px; color: var(--text3); font-weight: 500; }
+.bracket-round-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text3); margin: 14px 0 6px;
+}
+.bracket-round-label:first-of-type { margin-top: 0; }
+.bracket-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r2); overflow: hidden; margin-bottom: 8px;
+}
+.bracket-team-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.bracket-team-row:last-child { border-bottom: none; }
+.bracket-team-row.winner { background: var(--blue-bg); }
+.b-seed {
+  font-size: 12px; font-weight: 700; color: var(--text3);
+  width: 18px; flex-shrink: 0; text-align: center;
+}
+.bracket-team-row.winner .b-seed { color: var(--blue); }
+.b-info { flex: 1; min-width: 0; }
+.b-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bracket-team-row.winner .b-name { color: var(--blue); }
+.bracket-team-row.loser .b-name { color: var(--text3); font-weight: 500; }
+.b-cap { font-size: 11px; color: var(--text3); }
+.b-badge {
+  font-size: 9px; font-weight: 700; padding: 1px 5px;
+  border-radius: 4px; margin-left: 4px; vertical-align: middle;
+}
+.b-badge.auto { background: var(--avc-bg); color: var(--avc); }
+.b-badge.wild { background: var(--blue-bg); color: var(--blue); }
+.b-score {
+  font-size: 26px; font-weight: 800; color: var(--text);
+  min-width: 36px; text-align: right; font-variant-numeric: tabular-nums;
+}
+.bracket-team-row.winner .b-score { color: var(--blue); }
+.bracket-team-row.loser .b-score { color: var(--text3); font-weight: 600; }
+.b-score.pending { font-size: 18px; color: var(--text3); }
+.bracket-footer {
+  padding: 7px 16px; background: var(--bg2);
+  display: flex; justify-content: space-between;
+}
+.b-meta { font-size: 11px; color: var(--text3); }
+
+/* SuperVolley */
+.sv-card {
+  background: var(--bg2); border: 2px solid var(--blue);
+  border-radius: var(--r3); overflow: hidden; margin-top: 8px;
+}
+.sv-header {
+  background: var(--blue); padding: 12px 18px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sv-title { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -.2px; }
+.sv-time { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8); }
+.sv-body { padding: 16px; }
+.sv-team-row {
+  display: flex; align-items: center; gap: 12px; padding: 8px 0;
+}
+.sv-conf { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.sv-conf.avc { color: var(--avc); }
+.sv-conf.nvc { color: var(--nvc); }
+.sv-tname {
+  font-size: 18px; font-weight: 800; color: var(--text);
+  flex: 1; letter-spacing: -.3px;
+}
+.sv-tname.winner { color: var(--blue); }
+.sv-tscore {
+  font-size: 36px; font-weight: 900; color: var(--text);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.sv-tscore.winner { color: var(--blue); }
+.sv-tscore.loser { color: var(--text3); }
+.sv-vs {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--text3); padding: 4px 0;
+}
+
+/* ── RULES ── */
+.rules-section { margin-bottom: 20px; }
+.rules-section-title {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--blue); margin-bottom: 10px;
+}
+.rules-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r2); overflow: hidden;
+}
+.rules-row {
+  display: flex; align-items: center; padding: 13px 16px;
+  border-bottom: 1px solid var(--border); gap: 12px;
+}
+.rules-row:last-child { border-bottom: none; }
+.rules-row-key { font-size: 13px; color: var(--text2); flex: 1; }
+.rules-row-val { font-size: 14px; font-weight: 700; color: var(--text); text-align: right; }
+.rules-phase-row {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.rules-phase-row:last-child { border-bottom: none; }
+.rules-phase-top {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 5px;
+}
+.rules-phase-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  font-size: 14px; font-weight: 800; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rules-phase-num.final { background: transparent; border: 2px solid var(--blue); color: var(--blue); font-size: 12px; }
+.rules-phase-name { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.rules-phase-time {
+  font-size: 12px; font-weight: 600; color: var(--text3);
+  background: var(--bg2); padding: 2px 8px; border-radius: 8px;
+}
+.rules-phase-desc { font-size: 13px; color: var(--text2); line-height: 1.5; padding-left: 38px; }
+.games-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.games-box {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 12px 8px; text-align: center;
+}
+.games-num { font-size: 32px; font-weight: 900; line-height: 1; }
+.games-lbl { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.3; }
+
+/* ── STATUS PILL ── */
+.status-bar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 8px 18px;
+  font-size: 12px; color: var(--text3); font-weight: 500;
+  display: flex; justify-content: space-between;
+}
+
+/* ── LAST UPDATED ── */
+#lastUpdated {
+  text-align: center; font-size: 11px; color: var(--text3);
+  padding: 16px 0 4px; font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <div class="app-name">SuperVolley</div>
+    <div class="app-sub">FVL Spring 2026 · Live</div>
+  </div>
+  <div class="live-pill"><div class="live-dot"></div>Live</div>
+</div>
+
+<div class="status-bar">
+  <span id="statusLeft">Connecting…</span>
+  <span id="statusRight">—</span>
+</div>
+
+<!-- SCHEDULE -->
+<div class="screen active" id="screen-schedule">
+  <div class="team-picker-wrap">
+    <select class="team-picker" id="playerTeamFilter" onchange="applyTeamFilter(this.value)">
+      <option value="">All teams</option>
+    </select>
+  </div>
+  <div id="scheduleContent">
+    <div class="empty">
+      <div class="empty-icon">🏐</div>
+      <div class="empty-title">Draw Pending</div>
+      <div class="empty-body">Schedule appears once the director draws the pools</div>
+    </div>
+  </div>
+  <div id="lastUpdated"></div>
+</div>
+
+<!-- STANDINGS -->
+<div class="screen" id="screen-standings">
+  <div class="section-hdr">
+    <div class="section-title">Standings</div>
+    <div class="section-sub">Phase 1 · Pool play</div>
+  </div>
+  <div id="standingsContent">
+    <div class="empty"><div class="empty-icon">📊</div><div class="empty-title">No scores yet</div></div>
+  </div>
+</div>
+
+<!-- WILDCARD -->
+<div class="screen" id="screen-wildcard">
+  <div class="section-hdr">
+    <div class="section-title">Wildcard</div>
+    <div class="section-sub">Top 2 per division advance</div>
+  </div>
+  <div id="wildcardContent">
+    <div class="empty"><div class="empty-icon">🎟</div><div class="empty-title">Race not started</div></div>
+  </div>
+</div>
+
+<!-- BRACKET -->
+<div class="screen" id="screen-bracket">
+  <div class="section-hdr">
+    <div class="section-title">Bracket</div>
+    <div class="section-sub">Division semifinals onward</div>
+  </div>
+  <div id="bracketContent">
+    <div class="empty"><div class="empty-icon">🏆</div><div class="empty-title">Bracket pending</div><div class="empty-body">Seeding updates after Phase 2</div></div>
+  </div>
+</div>
+
+<!-- RULES -->
+<div class="screen" id="screen-rules">
+  <div class="section-hdr">
+    <div class="section-title">Format</div>
+    <div class="section-sub">Rules &amp; structure</div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">Tournament Phases</div>
+    <div class="rules-card">
+      <div class="rules-phase-row">
+        <div class="rules-phase-top">
+          <div class="rules-phase-num">1</div>
+          <div class="rules-phase-name">Qualifiers — Pool Play</div>
+          <div class="rules-phase-time">8:30 – 1:30</div>
+        </div>
+        <div class="rules-phase-desc">Full round-robin in your pool. 3 games. Pool winner auto-qualifies for the bracket.</div>
+      </div>
+      <div class="rules-phase-row">
+        <div class="rules-phase-top">
+          <div class="rules-phase-num">2</div>
+          <div class="rules-phase-name">Wildcard Round</div>
+          <div class="rules-phase-time">1:30 – 3:20</div>
+        </div>
+        <div class="rules-phase-desc">1 cross-pool game per team. Top 2 non-qualifiers per division earn wildcard spots.</div>
+      </div>
+      <div class="rules-phase-row">
+        <div class="rules-phase-top">
+          <div class="rules-phase-num">3</div>
+          <div class="rules-phase-name">Division Brackets</div>
+          <div class="rules-phase-time">3:20 – 4:55</div>
+        </div>
+        <div class="rules-phase-desc">4 teams per division seeded by combined record. SF (1v4, 2v3) → Division Final.</div>
+      </div>
+      <div class="rules-phase-row">
+        <div class="rules-phase-top">
+          <div class="rules-phase-num final">★</div>
+          <div class="rules-phase-name">SuperVolley Final</div>
+          <div class="rules-phase-time">4:55 – 5:20</div>
+        </div>
+        <div class="rules-phase-desc">AVC Champion vs NVC Champion. One game. Champion of Champions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">Games Per Team</div>
+    <div class="games-grid">
+      <div class="games-box"><div class="games-num" style="color:var(--text3)">4</div><div class="games-lbl">Did not qualify</div></div>
+      <div class="games-box"><div class="games-num" style="color:var(--nvc)">5</div><div class="games-lbl">SF exit</div></div>
+      <div class="games-box"><div class="games-num" style="color:var(--avc)">6</div><div class="games-lbl">Div final exit</div></div>
+      <div class="games-box"><div class="games-num" style="color:var(--blue)">7</div><div class="games-lbl">SuperVolley finalist</div></div>
+    </div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">Scoring Rules</div>
+    <div class="rules-card">
+      <div class="rules-row"><span class="rules-row-key">Scoring</span><span class="rules-row-val">Rally scoring</span></div>
+      <div class="rules-row"><span class="rules-row-key">Win condition</span><span class="rules-row-val">First to 21</span></div>
+      <div class="rules-row"><span class="rules-row-key">Deuce at 20–20</span><span class="rules-row-val">Win by 2</span></div>
+      <div class="rules-row"><span class="rules-row-key">Hard cap</span><span class="rules-row-val">25 wins outright</span></div>
+      <div class="rules-row"><span class="rules-row-key">Pool &amp; wildcard</span><span class="rules-row-val">25-min time cap</span></div>
+      <div class="rules-row"><span class="rules-row-key">Bracket games</span><span class="rules-row-val">No time cap</span></div>
+    </div>
+  </div>
+
+  <div class="rules-section">
+    <div class="rules-section-title">Break</div>
+    <div class="rules-card">
+      <div class="rules-row"><span class="rules-row-key">Scheduled break</span><span class="rules-row-val">11:00 – 11:10am</span></div>
+      <div class="rules-row"><span class="rules-row-key">Both courts</span><span class="rules-row-val">Stand down</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showScreen('schedule',this)">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Schedule</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('standings',this)">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">Standings</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('wildcard',this)">
+    <span class="nav-icon">🎟</span>
+    <span class="nav-label">Wildcard</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('bracket',this)">
+    <span class="nav-icon">🏆</span>
+    <span class="nav-label">Bracket</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('rules',this)">
+    <span class="nav-icon">📖</span>
+    <span class="nav-label">Rules</span>
+  </button>
+</nav>
+
+<script src="/tournament.js"></script>
+<script>
+let state = null;
+let activeTeamFilter = '';
+let activeScreen = 'schedule';
+
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  btn.classList.add('active');
+  activeScreen = id;
+  if (state) renderScreen(id);
+}
+
+function applyTeamFilter(val) {
+  activeTeamFilter = val;
+  renderSchedule();
+}
+
+// ── SSE ──
+const es = new EventSource('/api/stream');
+es.onmessage = e => {
+  const msg = JSON.parse(e.data);
+  if (msg.type === 'state') {
+    state = msg.state;
+    renderScreen(activeScreen);
+    const t = new Date();
+    document.getElementById('lastUpdated').textContent = 'Updated ' + t.toLocaleTimeString();
+    document.getElementById('statusRight').textContent = t.toLocaleTimeString();
+    document.getElementById('statusLeft').textContent = state.pools ? '16 teams · Draw complete' : 'Draw pending';
+  }
+};
+es.onerror = () => {
+  document.getElementById('statusLeft').textContent = 'Reconnecting…';
+};
+
+function renderScreen(id) {
+  if (id === 'schedule') renderSchedule();
+  if (id === 'standings') renderStandings();
+  if (id === 'wildcard') renderWildcard();
+  if (id === 'bracket') renderBracket();
+}
+
+// ── SCHEDULE ──
+function renderSchedule() {
+  const el = document.getElementById('scheduleContent');
+  if (!state?.schedule?.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🏐</div><div class="empty-title">Draw Pending</div><div class="empty-body">Schedule appears once the director draws the pools</div></div>`;
+    return;
+  }
+  const { schedule, gameScores = {} } = state;
+
+  // Populate team picker
+  const sel = document.getElementById('playerTeamFilter');
+  const teamMap = {};
+  schedule.filter(g => !g.isBreak).forEach(g => { teamMap[g.home] = g.homeCap; teamMap[g.away] = g.awayCap; });
+  const names = Object.keys(teamMap).sort();
+  const cur = sel.value || activeTeamFilter;
+  sel.innerHTML = '<option value="">All teams</option>' +
+    names.map(n => `<option value="${n}"${n===cur?' selected':''}>${teamMap[n]} · ${n}</option>`).join('');
+  if (cur && names.includes(cur)) { sel.value = cur; activeTeamFilter = cur; }
+
+  const sorted = [...schedule].sort((a,b) => a.time - b.time);
+  const phases = [
+    { id:'p1', label:'Phase 1 — Pool Play' },
+    { id:'p2', label:'Phase 2 — Wildcard' },
+  ];
+  let html = '';
+  let totalShown = 0;
+
+  for (const ph of phases) {
+    let games = sorted.filter(g => g.phase === ph.id || g.phase === 'break');
+    if (ph.id === 'p2') games = sorted.filter(g => g.phase === 'p2');
+    if (activeTeamFilter) games = games.filter(g => g.isBreak || g.home === activeTeamFilter || g.away === activeTeamFilter);
+    const realGames = games.filter(g => !g.isBreak);
+    if (!realGames.length) continue;
+    totalShown += realGames.length;
+    html += `<div class="phase-label">${ph.label}</div>`;
+    let brkDone = false;
+    for (const g of games) {
+      if (g.isBreak) {
+        if (!brkDone && !activeTeamFilter) {
+          html += `<div class="break-card"><span class="break-icon">⏸</span><span class="break-text">Break — both courts</span><span class="break-time">${timeStr(g.time)}–${timeStr(g.time+10)}</span></div>`;
+          brkDone = true;
+        }
+        continue;
+      }
+      const s = gameScores[g.id] || {};
+      const hS = s.home===''||s.home===undefined ? null : +s.home;
+      const aS = s.away===''||s.away===undefined ? null : +s.away;
+      const hasResult = hS !== null && aS !== null && hS !== aS;
+      const hWin = hasResult && hS > aS, aWin = hasResult && aS > hS;
+      const diff = hasResult ? Math.abs(hS - aS) : null;
+      html += `<div class="game-card${hasResult?' has-result':''}">
+        <div class="game-card-inner">
+          <div class="game-meta">
+            <span class="game-time">${timeStr(g.time)}</span>
+            <span class="game-court court-${g.court}">Court ${g.court}</span>
+            <span class="game-tag">${g.tag}</span>
+          </div>
+          <div class="game-matchup">
+            <div class="game-team-row">
+              <span class="team-name${hWin?' winner':aWin?' loser':''}">${g.home}</span>
+              <span class="team-score${hWin?' winner':aWin?' loser':hasResult?'':' pending'}">${hS!==null?hS:'–'}</span>
+            </div>
+            <div class="game-team-row">
+              <span class="team-name${aWin?' winner':hWin?' loser':''}">${g.away}</span>
+              <span class="team-score${aWin?' winner':hWin?' loser':hasResult?'':' pending'}">${aS!==null?aS:'–'}</span>
+            </div>
+          </div>
+        </div>
+        <div class="game-divider"></div>
+        <div class="game-footer">
+          <span class="captain-names">${g.homeCap} vs ${g.awayCap}</span>
+          ${diff!==null?`<span class="diff-chip">+${diff}</span>`:''}
+        </div>
+      </div>`;
+    }
+  }
+  if (activeTeamFilter && !totalShown) html = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">No games found</div></div>`;
+  el.innerHTML = html;
+}
+
+// ── STANDINGS ──
+function renderStandings() {
+  const el = document.getElementById('standingsContent');
+  if (!state?.pools || !state?.schedule) { el.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Draw pending</div></div>`; return; }
+  const { pools, schedule, gameScores = {} } = state;
+  const defs = [
+    {teams:pools.AVC.Fowler,tag:'Fowler · AVC',label:'Fowler',color:'var(--avc)',conf:'AVC'},
+    {teams:pools.AVC.Central,tag:'Central · AVC',label:'Central',color:'var(--avc)',conf:'AVC'},
+    {teams:pools.NVC.Dobbs,tag:'Dobbs · NVC',label:'Dobbs',color:'var(--nvc)',conf:'NVC'},
+    {teams:pools.NVC.Extreme,tag:'Extreme · NVC',label:'Extreme',color:'var(--nvc)',conf:'NVC'},
+  ];
+  let html = '<div class="standings-grid">';
+  defs.forEach(pd => {
+    const st = computePoolStandings(pd.teams, pd.tag, schedule, gameScores);
+    html += `<div class="pool-card">
+      <div class="pool-card-hdr">
+        <span class="pool-card-name" style="color:${pd.color}">${pd.label}</span>
+        <span class="pool-card-conf">${pd.conf}</span>
+      </div>
+      ${st.map((t,i) => {
+        const diff = t.pf - t.pa;
+        return `<div class="pool-row${i===0?' top':''}">
+          <div class="pool-rank">${i+1}</div>
+          <div class="pool-info">
+            <div class="pool-team">${t.name}${i===0?'<span class="auto-badge">AUTO</span>':''}</div>
+            <div class="pool-cap">${t.cap}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pool-wl">${t.w}–${t.l}</div>
+            <div class="pool-diff">${diff>=0?'+':''}${diff}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── WILDCARD ──
+function renderWildcard() {
+  const el = document.getElementById('wildcardContent');
+  if (!state?.pools || !state?.schedule) { el.innerHTML = `<div class="empty"><div class="empty-icon">🎟</div><div class="empty-title">Draw pending</div></div>`; return; }
+  const { pools, schedule, gameScores = {} } = state;
+  let html = '';
+  ['AVC','NVC'].forEach(div => {
+    const { sorted, autoQual, wildcards } = computeWildcardStandings(div, pools, schedule, gameScores);
+    const qualTeams = sorted.filter(t => autoQual.has(t.name));
+    const raceTeams = sorted.filter(t => !autoQual.has(t.name));
+    html += `<div class="wc-conf-block">
+      <div class="wc-conf-title">${div === 'AVC' ? 'American Volleyball Conference' : 'National Volleyball Conference'}</div>`;
+    if (qualTeams.length) {
+      html += `<div class="wc-qualified-banner">
+        <span class="wc-q-label">✓ Qualified</span>
+        <span class="wc-q-teams">${qualTeams.map(t=>t.name).join(' · ')}</span>
+      </div>`;
+    }
+    html += `<div class="wc-race-label"><span>Wildcard Race</span><span>${raceTeams.length} teams · 2 spots</span></div>`;
+    let cutDone = false;
+    raceTeams.forEach((t,i) => {
+      const isWC = wildcards.has(t.name);
+      const diff = t.pf - t.pa;
+      if (i === 2 && !cutDone) {
+        cutDone = true;
+        html += `<div class="cutline-bar"><div class="cutline-line"></div><span class="cutline-txt">Cutline</span><div class="cutline-line"></div></div>`;
+      }
+      html += `<div class="wc-card${isWC?' spot':''}">
+        <div class="wc-card-inner">
+          <div class="wc-pos">${i+1}</div>
+          <div class="wc-info">
+            <div class="wc-name">${t.name}</div>
+            <div class="wc-cap">${t.cap}</div>
+            <span class="wc-spot-badge ${isWC?'wc':'out'}">${isWC?'Wildcard ✓':'Eliminated'}</span>
+          </div>
+          <div class="wc-stats">
+            <div class="wc-wl">${t.w}–${t.l}</div>
+            <div class="wc-pdiff">${diff>=0?'+':''}${diff}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ── BRACKET ──
+function renderBracket() {
+  const el = document.getElementById('bracketContent');
+  if (!state?.pools || !state?.schedule) { el.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div><div class="empty-title">Bracket pending</div></div>`; return; }
+  const { pools, schedule, gameScores = {}, bracketScores = {} } = state;
+  let html = '';
+
+  ['AVC','NVC'].forEach(div => {
+    const seeds = getBracketSeeds(div, pools, schedule, gameScores);
+    const t3 = 420, c = div==='AVC'?1:2;
+    const mkBadge = (isA,isW) => isA?'<span class="b-badge auto">AUTO</span>':isW?'<span class="b-badge wild">WILD</span>':'';
+
+    const gameCard = (bid, home, away, tag, tVal) => {
+      const s = bracketScores[bid] || {};
+      const hS = s.home===''||!s.home?null:+s.home, aS = s.away===''||!s.away?null:+s.away;
+      const hasR = hS!==null&&aS!==null&&hS!==aS;
+      const hW = hasR&&hS>aS, aW = hasR&&aS>hS;
+      return `<div class="bracket-card">
+        <div class="bracket-team-row${hW?' winner':hasR?' loser':''}">
+          <div class="b-seed">${home?home.seed:'?'}</div>
+          <div class="b-info">
+            <div class="b-name">${home?home.name:'TBD'}${home?mkBadge(home.isAuto,home.isWC):''}</div>
+            <div class="b-cap">${home?home.captain:''}</div>
+          </div>
+          <div class="b-score${hS!==null?(hW?' winner':' loser'):(hasR?'':' pending')}">${hS!==null?hS:'–'}</div>
+        </div>
+        <div class="bracket-team-row${aW?' winner':hasR?' loser':''}">
+          <div class="b-seed">${away?away.seed:'?'}</div>
+          <div class="b-info">
+            <div class="b-name">${away?away.name:'TBD'}${away?mkBadge(away.isAuto,away.isWC):''}</div>
+            <div class="b-cap">${away?away.captain:''}</div>
+          </div>
+          <div class="b-score${aS!==null?(aW?' winner':' loser'):(hasR?'':' pending')}">${aS!==null?aS:'–'}</div>
+        </div>
+        <div class="bracket-footer">
+          <span class="b-meta">${tag}</span>
+          <span class="b-meta">${timeStr(tVal)} · Court ${c}</span>
+        </div>
+      </div>`;
+    };
+
+    html += `<div class="bracket-conf">
+      <div class="bracket-conf-hdr">
+        <div class="bracket-conf-name">${div}</div>
+        <div class="bracket-conf-sub">${div==='AVC'?'American':'National'} Volleyball Conference</div>
+      </div>
+      <div class="bracket-round-label">Semifinal 1 · Seed 1 vs 4</div>
+      ${gameCard(div+'-sf1',seeds[0],seeds[3],div+' SF1',t3)}
+      <div class="bracket-round-label">Semifinal 2 · Seed 2 vs 3</div>
+      ${gameCard(div+'-sf2',seeds[1],seeds[2],div+' SF2',t3+25)}
+      <div class="bracket-round-label">${div} Championship Final</div>
+      ${gameCard(div+'-final',null,null,div+' Final',t3+50)}
+    </div>`;
+  });
+
+  // SuperVolley
+  const sv = bracketScores['supervolley'] || {};
+  const shS = sv.home===''||!sv.home?null:+sv.home, saS = sv.away===''||!sv.away?null:+sv.away;
+  const svHR = shS!==null&&saS!==null&&shS!==saS;
+  html += `<div class="sv-card">
+    <div class="sv-header">
+      <div class="sv-title">★ SuperVolley Final</div>
+      <div class="sv-time">4:55pm</div>
+    </div>
+    <div class="sv-body">
+      <div class="sv-team-row">
+        <div style="width:36px;text-align:center"><span class="sv-conf avc">AVC</span></div>
+        <div class="sv-tname${svHR&&shS>saS?' winner':''}">AVC Champion</div>
+        <div class="sv-tscore${svHR?shS>saS?' winner':' loser':''}">${shS!==null?shS:'–'}</div>
+      </div>
+      <div class="sv-vs">vs</div>
+      <div class="sv-team-row">
+        <div style="width:36px;text-align:center"><span class="sv-conf nvc">NVC</span></div>
+        <div class="sv-tname${svHR&&saS>shS?' winner':''}">NVC Champion</div>
+        <div class="sv-tscore${svHR?saS>shS?' winner':' loser':''}">${saS!==null?saS:'–'}</div>
+      </div>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+</script>
+</body>
+</html>
