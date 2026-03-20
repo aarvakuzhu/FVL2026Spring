@@ -72,6 +72,7 @@ body.light .btn-danger:hover{background:#fff0f0;border-color:#c02020}
   <div class="db-status">
     <div class="sync-dot" id="syncDot"></div>
     <span id="syncLabel">Synced</span>
+    <button class="logout-btn" id="lockBtn" onclick="toggleLock()" title="Lock schedule">🔓 Lock</button>
     <button class="logout-btn" onclick="doLogout()">Log out</button>
   </div>
 </div>
@@ -302,6 +303,22 @@ body.light .btn-danger:hover{background:#fff0f0;border-color:#c02020}
   </div>
 </div>
 
+<!-- UNLOCK MODAL -->
+<div class="confirm-overlay" id="unlockModal" onclick="closeConfirm('unlockModal')">
+  <div class="confirm-card" onclick="event.stopPropagation()" style="max-width:340px">
+    <div class="confirm-title" style="color:var(--accent)">🔐 Schedule Locked</div>
+    <div class="confirm-body">The schedule has been locked and shared with captains. Enter the director password to unlock and allow resets.</div>
+    <div style="margin-bottom:12px">
+      <input type="password" id="unlockInput" class="field-input" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doUnlock()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:9px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;outline:none;width:100%;margin-top:8px">
+      <div id="unlockError" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:6px;min-height:14px"></div>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm('unlockModal');document.getElementById('unlockInput').value=''">Cancel</button>
+      <button class="btn btn-primary" onclick="doUnlock()">Unlock →</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 </div><!-- end mainApp -->
 
@@ -339,20 +356,27 @@ function doLogout() {
 
 // Try auto-login with stored token
 if (directorToken) {
-  fetch('/api/state', { headers:{'x-director-token': directorToken} })
-    .then(r => r.ok ? r.json() : null)
+  fetch('/api/state')
+    .then(r => r.json())
     .then(state => {
-      if (state) {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        applyState(state);
-      } else { directorToken = null; sessionStorage.removeItem('sv_token'); }
+      // Token may be stale after server restart — try a write to verify
+      return fetch('/api/scores', {
+        method:'PATCH',
+        headers:{'Content-Type':'application/json','x-director-token':directorToken},
+        body:JSON.stringify({gameScores:{},bracketScores:{}})
+      }).then(r => {
+        if (r.status === 401) {
+          // Token expired — clear and show login
+          directorToken = null; sessionStorage.removeItem('sv_token');
+        } else {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainApp').style.display = 'block';
+          applyState(state);
+        }
+      });
     }).catch(() => {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
+      directorToken = null; sessionStorage.removeItem('sv_token');
     });
-} else {
-  // Not logged in — show login screen, still visible
 }
 
 // ── STATE SYNC ────────────────────────────────────────
@@ -400,6 +424,7 @@ function applyState(serverState) {
   }
   if (serverState.gameScores) gameScores = serverState.gameScores;
   if (serverState.bracketScores) bracketScores = serverState.bracketScores;
+  if (serverState.locked !== undefined) { locked = serverState.locked; updateLockUI(); }
   if (serverState.step !== undefined) {
     // restore step silently without re-triggering builds
   }
@@ -410,12 +435,13 @@ async function saveStateNow() {
   if (!directorToken) return;
   setSyncStatus('saving', 'Saving…');
   try {
-    const body = { teams, pools, schedule, schedMode, gameScores, bracketScores };
+    const body = { teams, pools, schedule, schedMode, gameScores, bracketScores, locked };
     const r = await fetch('/api/state', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'x-director-token': directorToken },
       body: JSON.stringify(body)
     });
+    if (r.status === 401) { handleTokenExpiry(); return; }
     if (r.ok) setSyncStatus('idle', 'Saved');
     else setSyncStatus('error', 'Save failed');
   } catch { setSyncStatus('error', 'Offline'); }
@@ -437,9 +463,22 @@ async function patchScores() {
       headers: { 'Content-Type':'application/json', 'x-director-token': directorToken },
       body: JSON.stringify({ gameScores, bracketScores })
     });
+    if (r.status === 401) { handleTokenExpiry(); return; }
     if (r.ok) setSyncStatus('idle', 'Saved');
     else setSyncStatus('error', 'Save failed');
   } catch { setSyncStatus('error', 'Offline'); }
+}
+
+function handleTokenExpiry() {
+  directorToken = null;
+  sessionStorage.removeItem('sv_token');
+  setSyncStatus('error', 'Session expired');
+  // Show a re-login prompt after brief delay
+  setTimeout(() => {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginError').textContent = 'Session expired — please log in again';
+  }, 800);
 }
 
 // ── APP STATE ─────────────────────────────────────────
@@ -451,6 +490,7 @@ let activeFilter = 'all';
 let gameScores = {};
 let bracketScores = {};
 let isLight = false;
+let locked = false;
 
 // ── TEAMS ─────────────────────────────────────────────
 function initTeamList() { renderTeamList(teams); }
@@ -473,9 +513,11 @@ function searchTeams(q) {
 }
 // ── RESET ─────────────────────────────────────────────
 function confirmReset() {
+  if (locked) { openUnlockModal('full'); return; }
   document.getElementById('confirmReset').classList.add('open');
 }
 function confirmResetScores() {
+  if (locked) { openUnlockModal('scores'); return; }
   document.getElementById('confirmScores').classList.add('open');
 }
 function closeConfirm(id) {
@@ -631,9 +673,11 @@ function renderSchedule(filter) {
     let games = sorted.filter(g => g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
     if (filter==='c1') games = sorted.filter(g=>(g.phase===ph.id&&g.court===1)||(ph.id==='p1'&&g.phase==='break'));
     else if (filter==='c2') games = sorted.filter(g=>(g.phase===ph.id&&g.court===2)||(ph.id==='p1'&&g.phase==='break'));
-    // Apply team filter
+    // Apply team filter — include games where team is playing OR captain is umpiring
     if (activeTeamFilter) {
-      games = games.filter(g => g.isBreak || g.home===activeTeamFilter || g.away===activeTeamFilter);
+      const cap = schedule.filter(g=>!g.isBreak).find(g=>g.home===activeTeamFilter||g.away===activeTeamFilter);
+      const captain = cap ? (cap.home===activeTeamFilter ? cap.homeCap : cap.awayCap) : null;
+      games = games.filter(g => g.isBreak || g.home===activeTeamFilter || g.away===activeTeamFilter || (captain && g.umpire===captain));
     }
     if (!games.filter(g=>!g.isBreak).length) continue;
     html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;
@@ -798,7 +842,67 @@ function renderBracket() {
   document.getElementById('bracketView').innerHTML = html;
 }
 
-// ── MODAL ─────────────────────────────────────────────
+// ── LOCK ──────────────────────────────────────────────
+let _pendingResetAfterUnlock = null;
+
+function toggleLock() {
+  if (!schedule.length) { toast('Generate the schedule first'); return; }
+  if (locked) {
+    openUnlockModal(null); // just unlock, no reset
+  } else {
+    locked = true;
+    updateLockUI();
+    debouncedSave();
+    toast('Schedule locked 🔒 — password required to reset');
+  }
+}
+
+function updateLockUI() {
+  const btn = document.getElementById('lockBtn');
+  if (!btn) return;
+  btn.textContent = locked ? '🔒 Locked' : '🔓 Lock';
+  btn.style.color = locked ? 'var(--accent)' : '';
+  btn.style.borderColor = locked ? 'var(--accent)' : '';
+}
+
+function openUnlockModal(action) {
+  _pendingResetAfterUnlock = action;
+  document.getElementById('unlockInput').value = '';
+  document.getElementById('unlockError').textContent = '';
+  document.getElementById('unlockModal').classList.add('open');
+  setTimeout(() => document.getElementById('unlockInput').focus(), 100);
+}
+
+async function doUnlock() {
+  const pw = document.getElementById('unlockInput').value;
+  const errEl = document.getElementById('unlockError');
+  if (!pw) { errEl.textContent = 'Enter the password'; return; }
+  try {
+    const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) });
+    if (r.ok) {
+      // Password correct — unlock
+      locked = false;
+      updateLockUI();
+      closeConfirm('unlockModal');
+      document.getElementById('unlockInput').value = '';
+      debouncedSave();
+      // Now open the intended reset dialog
+      if (_pendingResetAfterUnlock === 'full') {
+        document.getElementById('confirmReset').classList.add('open');
+      } else if (_pendingResetAfterUnlock === 'scores') {
+        document.getElementById('confirmScores').classList.add('open');
+      } else {
+        toast('Schedule unlocked 🔓');
+      }
+      _pendingResetAfterUnlock = null;
+    } else {
+      errEl.textContent = 'Wrong password';
+      document.getElementById('unlockInput').value = '';
+      document.getElementById('unlockInput').focus();
+    }
+  } catch { errEl.textContent = 'Server error'; }
+}
+
 function openModal(){document.getElementById('modalOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''}
 function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal()}
@@ -807,6 +911,7 @@ document.addEventListener('keydown',e=>{
     closeModal();
     closeConfirm('confirmReset');
     closeConfirm('confirmScores');
+    closeConfirm('unlockModal');
   }
 });
 

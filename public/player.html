@@ -350,17 +350,24 @@ function renderSchedule() {
     {id:'p2', label:'Wildcard round', time:'1:30pm – 3:20pm', badge:'b-p2', bl:'Phase 2'},
   ];
   let html = '';
+  // Derive captain for the filtered team
+  const filteredCap = activeTeamFilter
+    ? (() => { const g = sorted.find(g=>!g.isBreak&&(g.home===activeTeamFilter||g.away===activeTeamFilter)); return g?(g.home===activeTeamFilter?g.homeCap:g.awayCap):null; })()
+    : null;
+
   // Team filter label
   if (activeTeamFilter) {
+    const playingCount = sorted.filter(g=>!g.isBreak&&(g.home===activeTeamFilter||g.away===activeTeamFilter)).length;
+    const umpireCount = sorted.filter(g=>!g.isBreak&&g.umpire===filteredCap).length;
     html += `<div style="background:var(--avc-bg);border:1px solid var(--avc-dim);border-radius:var(--r);padding:7px 12px;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--avc);display:flex;justify-content:space-between;align-items:center">
       <span>Showing games for: <b>${activeTeamFilter}</b></span>
-      <span style="color:var(--muted)">${sorted.filter(g=>!g.isBreak&&(g.home===activeTeamFilter||g.away===activeTeamFilter)).length} games</span>
+      <span style="color:var(--muted)">${playingCount} playing · ${umpireCount} umpiring</span>
     </div>`;
   }
   for (const ph of phases) {
     let games = sorted.filter(g => g.phase === ph.id || (ph.id === 'p1' && g.phase === 'break'));
     if (activeTeamFilter) {
-      games = games.filter(g => g.isBreak || g.home === activeTeamFilter || g.away === activeTeamFilter);
+      games = games.filter(g => g.isBreak || g.home === activeTeamFilter || g.away === activeTeamFilter || (filteredCap && g.umpire === filteredCap));
     }
     if (!games.filter(g => !g.isBreak).length) continue;
     html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;

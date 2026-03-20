@@ -931,8 +931,13 @@ function renderSchedule() {
   buildTeamChips(schedule);
 
   const sorted = [...schedule].sort((a, b) => a.time - b.time);
+
+  // Derive captain for filtered team
+  const filteredCapGame = activeTeam ? sorted.find(g => !g.isBreak && (g.home===activeTeam||g.away===activeTeam)) : null;
+  const filteredCap = filteredCapGame ? (filteredCapGame.home===activeTeam ? filteredCapGame.homeCap : filteredCapGame.awayCap) : null;
+
   const filtered = activeTeam
-    ? sorted.filter(g => g.isBreak || g.home === activeTeam || g.away === activeTeam)
+    ? sorted.filter(g => g.isBreak || g.home===activeTeam || g.away===activeTeam || (filteredCap && g.umpire===filteredCap))
     : sorted;
 
   // Group by time slot
