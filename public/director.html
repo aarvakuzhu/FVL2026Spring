@@ -142,6 +142,11 @@
       <button class="fbtn" onclick="filterSched('c1',this)">Court 1</button>
       <button class="fbtn" onclick="filterSched('c2',this)">Court 2</button>
     </div>
+    <div style="margin-bottom:10px">
+      <select id="teamFilterSelect" onchange="filterByTeam(this.value)" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:6px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:100%;outline:none">
+        <option value="">All teams — no filter</option>
+      </select>
+    </div>
     <div id="scheduleView"></div>
     <div style="margin-top:12px"><button class="btn btn-primary" onclick="goTo(3)">View Standings →</button></div>
   </div>
@@ -164,7 +169,7 @@
   </div>
 </div>
 
-<!-- MODAL (same as before) -->
+<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-header">
@@ -173,30 +178,59 @@
     </div>
     <div class="modal-body">
       <div class="m-section">
-        <div class="m-section-title avc">Tournament Overview</div>
+        <div class="m-section-title avc">Conferences</div>
         <div class="m-conf-grid">
           <div class="m-conf avc"><div class="m-conf-name">AVC</div><div class="m-conf-pools">American Volleyball Conference<br>Fowler Pool · Central Pool<br>8 teams total</div></div>
           <div class="m-conf nvc"><div class="m-conf-name">NVC</div><div class="m-conf-pools">National Volleyball Conference<br>Dobbs Pool · Extreme Pool<br>8 teams total</div></div>
         </div>
       </div>
       <div class="m-section">
-        <div class="m-section-title accent">Tournament Phases</div>
-        <div class="m-phase"><div class="m-phase-num">1</div><div><div class="m-phase-name">Qualifiers — Pool Play</div><div class="m-phase-desc">Full round-robin in each pool. 3 games per team. Pool winner auto-qualifies for division bracket.</div></div><div class="m-phase-time">8:30am<br>1:30pm</div></div>
-        <div class="m-phase"><div class="m-phase-num">2</div><div><div class="m-phase-name">Wildcard Round</div><div class="m-phase-desc">All 16 teams play 1 random cross-pool game within division. Top 2 non-qualifiers per division earn wildcard spots.</div></div><div class="m-phase-time">1:30pm<br>3:20pm</div></div>
-        <div class="m-phase"><div class="m-phase-num">3</div><div><div class="m-phase-name">Division Brackets</div><div class="m-phase-desc">4 teams per division seeded 1–4 by combined record. SF → Division Final. Both run simultaneously.</div></div><div class="m-phase-time">3:20pm<br>4:55pm</div></div>
-        <div class="m-phase"><div class="m-phase-num">★</div><div><div class="m-phase-name">SuperVolley Final</div><div class="m-phase-desc">AVC Champion vs NVC Champion. Champion of Champions crowned.</div></div><div class="m-phase-time">4:55pm<br>5:20pm</div></div>
+        <div class="m-section-title accent">Tournament Format</div>
+        <div class="m-phase"><div class="m-phase-num">1</div><div><div class="m-phase-name">Qualifiers — Pool Play</div><div class="m-phase-desc">Full round-robin within your pool — every team plays all 3 opponents. Pool winner automatically qualifies for the division bracket. No elimination in this phase.</div></div><div class="m-phase-time">8:30am<br>1:30pm</div></div>
+        <div class="m-phase"><div class="m-phase-num">2</div><div><div class="m-phase-name">Wildcard Round</div><div class="m-phase-desc">All 16 teams play 1 randomly drawn cross-pool game within their division. Top 2 non-qualified teams per division (by combined Phase 1 + Phase 2 record) earn wildcard spots into the bracket.</div></div><div class="m-phase-time">1:30pm<br>3:20pm</div></div>
+        <div class="m-phase"><div class="m-phase-num">3</div><div><div class="m-phase-name">Division Brackets</div><div class="m-phase-desc">4 teams per division — 2 auto-qualified + 2 wildcards. Seeded 1–4 by combined record. Seed 1 vs Seed 4 · Seed 2 vs Seed 3. Division Final decides the conference champion. AVC and NVC brackets run simultaneously.</div></div><div class="m-phase-time">3:20pm<br>4:55pm</div></div>
+        <div class="m-phase" style="border-bottom:none"><div class="m-phase-num" style="color:var(--accent)">★</div><div><div class="m-phase-name" style="color:var(--accent)">SuperVolley Final</div><div class="m-phase-desc">AVC Champion vs NVC Champion. One game. Champion of Champions crowned.</div></div><div class="m-phase-time">4:55pm<br>5:20pm</div></div>
       </div>
       <div class="m-section">
-        <div class="m-section-title red">Volleyball Scoring Rules</div>
+        <div class="m-section-title nvc">Games Per Team</div>
+        <div class="m-games-grid">
+          <div class="m-gbox"><div class="m-gbox-num" style="color:var(--muted)">4</div><div class="m-gbox-lbl">Did not qualify</div><div class="m-gbox-teams" style="color:var(--muted)">8 teams</div></div>
+          <div class="m-gbox"><div class="m-gbox-num" style="color:var(--nvc)">5</div><div class="m-gbox-lbl">SF exit</div><div class="m-gbox-teams" style="color:var(--nvc)">4 teams</div></div>
+          <div class="m-gbox"><div class="m-gbox-num" style="color:var(--avc)">6</div><div class="m-gbox-lbl">Div final exit</div><div class="m-gbox-teams" style="color:var(--avc)">2 teams</div></div>
+          <div class="m-gbox"><div class="m-gbox-num" style="color:var(--accent)">7</div><div class="m-gbox-lbl">SuperVolley finalists</div><div class="m-gbox-teams" style="color:var(--accent)">2 teams</div></div>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title accent">Wildcard Qualification</div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text">Ranked by combined Phase 1 + Phase 2 win-loss record</div></div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text">Pool winners are already qualified — excluded from the wildcard race</div></div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text"><b>Tiebreaker 1:</b> point differential across all games (capped per game)</div></div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text"><b>Tiebreaker 2:</b> head-to-head result · <b>Final:</b> coin flip</div></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title nvc">Bracket Seeding</div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text">All 4 bracket teams ranked together by combined record — no protected seeds</div></div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text">Pool winners can be seeded 3 or 4 if their record warrants it</div></div>
+        <div class="m-rule" style="border-bottom:none"><div class="m-rule-dot"></div><div class="m-rule-text"><b>Semifinal matchups:</b> Seed 1 vs Seed 4 · Seed 2 vs Seed 3</div></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title red">Volleyball Scoring</div>
         <div class="m-scoring">
-          <div class="m-score-row"><span class="m-score-key">Scoring</span><span class="m-score-val">Rally — every serve scores</span></div>
+          <div class="m-score-row"><span class="m-score-key">Scoring system</span><span class="m-score-val">Rally — every serve scores a point</span></div>
           <div class="m-score-row"><span class="m-score-key">Win condition</span><span class="m-score-val">First to 21 points</span></div>
-          <div class="m-score-row"><span class="m-score-key">Deuce</span><span class="m-score-val">20–20 → win by 2</span></div>
-          <div class="m-score-row"><span class="m-score-key">Hard cap</span><span class="m-score-val">25 pts — first to 25 wins outright</span></div>
-          <div class="m-score-row"><span class="m-score-key">Pool &amp; wildcard</span><span class="m-score-val">25-min time cap — leader wins</span></div>
+          <div class="m-score-row"><span class="m-score-key">Deuce triggers at</span><span class="m-score-val">20 – 20</span></div>
+          <div class="m-score-row"><span class="m-score-key">Deuce rule</span><span class="m-score-val">Must win by 2 clear points</span></div>
+          <div class="m-score-row"><span class="m-score-key">Hard cap</span><span class="m-score-val">25 pts — first to 25 wins outright, no 2-pt gap needed</span></div>
+          <div class="m-score-row"><span class="m-score-key">Pool &amp; wildcard</span><span class="m-score-val">25-min time cap — leader wins at the buzzer</span></div>
           <div class="m-score-row"><span class="m-score-key">Bracket games</span><span class="m-score-val">No time cap — play to completion</span></div>
         </div>
       </div>
+      <div class="m-section" style="margin-bottom:0">
+        <div class="m-section-title purple">Scheduled Break</div>
+        <div class="m-rule"><div class="m-rule-dot"></div><div class="m-rule-text"><b>11:00am – 11:10am</b> — 10-minute break, both courts stand down simultaneously</div></div>
+        <div class="m-rule" style="border-bottom:none"><div class="m-rule-dot"></div><div class="m-rule-text">All games resume at 11:10am sharp</div></div>
+      </div>
+      <div style="text-align:center;padding-top:12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">FVL Spring 2026 · SuperVolley · Director View</div>
     </div>
   </div>
 </div>
@@ -436,8 +470,25 @@ function buildSchedule() {
   if (!pools) return;
   schedule = buildScheduleFromPools(pools, schedMode);
   renderSchedule(activeFilter);
+  populateTeamFilter();
   debouncedSave();
 }
+let activeTeamFilter = '';
+
+function populateTeamFilter() {
+  const sel = document.getElementById('teamFilterSelect');
+  if (!sel || !schedule.length) return;
+  const names = [...new Set(schedule.filter(g=>!g.isBreak).flatMap(g=>[g.home,g.away]))].sort();
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All teams — no filter</option>' +
+    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+}
+
+function filterByTeam(name) {
+  activeTeamFilter = name;
+  renderSchedule(activeFilter);
+}
+
 function filterSched(f, btn) {
   activeFilter = f;
   document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
@@ -458,6 +509,10 @@ function renderSchedule(filter) {
     if (filter==='c1') games = sorted.filter(g=>(g.phase===ph.id&&g.court===1)||(ph.id==='p1'&&g.phase==='break'));
     else if (filter==='c2') games = sorted.filter(g=>(g.phase===ph.id&&g.court===2)||(ph.id==='p1'&&g.phase==='break'));
     else if (filter===ph.id) games = sorted.filter(g=>g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
+    // Apply team filter
+    if (activeTeamFilter) {
+      games = games.filter(g => g.isBreak || g.home===activeTeamFilter || g.away===activeTeamFilter);
+    }
     if (!games.filter(g=>!g.isBreak).length) continue;
     html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;
     let brkDone = false;

@@ -30,6 +30,10 @@
 .score-val-ro.lose-s{color:var(--muted)}
 .score-val-ro.pending{color:var(--dim)}
 .last-updated{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;padding:12px;border-top:1px solid var(--border);margin-top:4px}
+/* Team filter highlight */
+.game-row.my-team{border-color:var(--avc-dim)!important}
+.game-row.my-team .gr-home,.game-row.my-team .gr-away{font-weight:600}
+select{cursor:pointer}
 
 /* RULES TAB */
 .rules-section{margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;padding:14px}
@@ -110,6 +114,11 @@ body.light .rules-phase-time{background:var(--surface2)}
 </div>
 
 <div class="tab-pane active" id="tab-schedule">
+  <div style="margin-bottom:10px">
+    <select id="playerTeamFilter" onchange="applyTeamFilter(this.value)" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;width:100%;outline:none">
+      <option value="">All teams — no filter</option>
+    </select>
+  </div>
   <div id="scheduleView"><div class="no-data"><div class="no-data-big">LOADING</div><p>Waiting for tournament data…</p></div></div>
 </div>
 <div class="tab-pane" id="tab-standings">
@@ -260,6 +269,23 @@ body.light .rules-phase-time{background:var(--surface2)}
 <script>
 let state = null;
 let isLight = false;
+let activeTeamFilter = '';
+
+function populatePlayerTeamFilter(schedule) {
+  const sel = document.getElementById('playerTeamFilter');
+  if (!sel || !schedule) return;
+  const names = [...new Set(schedule.filter(g=>!g.isBreak).flatMap(g=>[g.home,g.away]))].sort();
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All teams — no filter</option>' +
+    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+  // Restore previous selection if still valid
+  if (cur && names.includes(cur)) sel.value = cur;
+}
+
+function applyTeamFilter(name) {
+  activeTeamFilter = name;
+  renderSchedule();
+}
 
 function showTab(id, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -314,14 +340,25 @@ function renderSchedule() {
     return;
   }
   const { schedule, gameScores = {} } = state;
+  populatePlayerTeamFilter(schedule);
   const sorted = [...schedule].sort((a,b) => a.time - b.time || (a.isBreak ? -1 : 1));
   const phases = [
     {id:'p1', label:'Qualifiers — Pool play', time:'8:30am – 1:30pm', badge:'b-p1', bl:'Phase 1'},
     {id:'p2', label:'Wildcard round', time:'1:30pm – 3:20pm', badge:'b-p2', bl:'Phase 2'},
   ];
   let html = '';
+  // Team filter label
+  if (activeTeamFilter) {
+    html += `<div style="background:var(--avc-bg);border:1px solid var(--avc-dim);border-radius:var(--r);padding:7px 12px;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--avc);display:flex;justify-content:space-between;align-items:center">
+      <span>Showing games for: <b>${activeTeamFilter}</b></span>
+      <span style="color:var(--muted)">${sorted.filter(g=>!g.isBreak&&(g.home===activeTeamFilter||g.away===activeTeamFilter)).length} games</span>
+    </div>`;
+  }
   for (const ph of phases) {
-    const games = sorted.filter(g => g.phase === ph.id || (ph.id === 'p1' && g.phase === 'break'));
+    let games = sorted.filter(g => g.phase === ph.id || (ph.id === 'p1' && g.phase === 'break'));
+    if (activeTeamFilter) {
+      games = games.filter(g => g.isBreak || g.home === activeTeamFilter || g.away === activeTeamFilter);
+    }
     if (!games.filter(g => !g.isBreak).length) continue;
     html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;
     let brkDone = false;
@@ -334,7 +371,8 @@ function renderSchedule() {
       const hS = s.home === '' || s.home === undefined ? null : +s.home;
       const aS = s.away === '' || s.away === undefined ? null : +s.away;
       const hasResult = hS !== null && aS !== null && hS !== aS;
-      const rowClass = 'game-row' + (hasResult ? hS > aS ? ' home-win' : ' away-win' : '');
+      const isMyTeam = activeTeamFilter && (g.home === activeTeamFilter || g.away === activeTeamFilter);
+      const rowClass = 'game-row' + (hasResult ? hS > aS ? ' home-win' : ' away-win' : '') + (isMyTeam ? ' my-team' : '');
       const diff = hasResult ? Math.abs(hS - aS) : null;
       const cc = g.court === 1 ? 'c1' : 'c2';
       const hScoreClass = hasResult ? (hS > aS ? 'win-s' : 'lose-s') : 'pending';
