@@ -930,8 +930,8 @@ function buildTeamChips(schedule) {
 
 // ── SCHEDULE ──
 function renderSchedule() {
-  const cards = document.getElementById('cardsSection');
   const lane = document.getElementById('timeLane');
+  const cards = document.getElementById('cardsSection');
   if (!state?.schedule?.length) {
     if (lane) lane.innerHTML = '';
     if (cards) cards.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏐</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text2)">Draw pending</div><div style="font-size:14px;margin-top:6px">Schedule appears once the director draws the pools</div></div>`;
@@ -963,11 +963,8 @@ function renderSchedule() {
   if (selectedTime === null || !timeGroups[selectedTime]) selectedTime = times[0];
 
   // Build time lane
-  const lane = document.getElementById('timeLane');
   let laneHtml = '';
   // Add break pills
-  const breakGames = sorted.filter(g => g.phase === 'break');
-
   times.forEach(t => {
     const games = timeGroups[t];
     const hasResult = games.some(g => {
@@ -976,7 +973,6 @@ function renderSchedule() {
       const a = s.away===''||s.away===undefined?null:+s.away;
       return h!==null && a!==null && h!==a;
     });
-    // Insert break pill if this time is the break
     if (t === 160 || t === 150) {
       laneHtml += `<div class="break-pill"><span class="bp-icon">⏸</span><span class="bp-text">11:00</span></div>`;
     }
@@ -988,7 +984,6 @@ function renderSchedule() {
   lane.innerHTML = laneHtml;
 
   // Build cards for selected time
-  const cards = document.getElementById('cardsSection');
   if (selectedTime === null || !timeGroups[selectedTime]) { cards.innerHTML = ''; return; }
 
   const curGames = timeGroups[selectedTime];
