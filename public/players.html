@@ -1114,7 +1114,7 @@ function renderStandings() {
         ${st.map((t,i) => {
           const diff = t.pf - t.pa;
           return `<div class="st-row${i===0?' p1':''}">
-            ${i===0?'<div class="qual-pip"></div>':'<div class="st-num">'+（i+1)+'</div>'}
+            ${i===0?'<div class="qual-pip"></div>':'<div class="st-num">'+(i+1)+'</div>'}
             <div class="st-info"><div class="st-name">${t.name}</div><div class="st-cap">${t.cap}</div></div>
             <div><div class="st-wl">${t.w}–${t.l}</div><div class="st-diff">${diff>=0?'+':''}${diff}</div></div>
           </div>`;
