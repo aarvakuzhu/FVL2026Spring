@@ -274,11 +274,15 @@ let activeTeamFilter = '';
 function populatePlayerTeamFilter(schedule) {
   const sel = document.getElementById('playerTeamFilter');
   if (!sel || !schedule) return;
-  const names = [...new Set(schedule.filter(g=>!g.isBreak).flatMap(g=>[g.home,g.away]))].sort();
+  const teamMap = {};
+  schedule.filter(g=>!g.isBreak).forEach(g=>{
+    teamMap[g.home] = g.homeCap;
+    teamMap[g.away] = g.awayCap;
+  });
+  const names = Object.keys(teamMap).sort();
   const cur = sel.value;
   sel.innerHTML = '<option value="">All teams — no filter</option>' +
-    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
-  // Restore previous selection if still valid
+    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${teamMap[n]} · ${n}</option>`).join('');
   if (cur && names.includes(cur)) sel.value = cur;
 }
 

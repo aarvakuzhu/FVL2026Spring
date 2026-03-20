@@ -592,10 +592,16 @@ let activeTeamFilter = '';
 function populateTeamFilter() {
   const sel = document.getElementById('teamFilterSelect');
   if (!sel || !schedule.length) return;
-  const names = [...new Set(schedule.filter(g=>!g.isBreak).flatMap(g=>[g.home,g.away]))].sort();
+  // Build name→captain map from schedule data
+  const teamMap = {};
+  schedule.filter(g=>!g.isBreak).forEach(g=>{
+    teamMap[g.home] = g.homeCap;
+    teamMap[g.away] = g.awayCap;
+  });
+  const names = Object.keys(teamMap).sort();
   const cur = sel.value;
   sel.innerHTML = '<option value="">All teams — no filter</option>' +
-    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${n}</option>`).join('');
+    names.map(n=>`<option value="${n}"${n===cur?' selected':''}>${teamMap[n]} · ${n}</option>`).join('');
 }
 
 function filterByTeam(name) {
