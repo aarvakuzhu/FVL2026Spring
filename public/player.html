@@ -30,6 +30,46 @@
 .score-val-ro.lose-s{color:var(--muted)}
 .score-val-ro.pending{color:var(--dim)}
 .last-updated{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;padding:12px;border-top:1px solid var(--border);margin-top:4px}
+
+/* RULES TAB */
+.rules-section{margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;padding:14px}
+.rules-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.08em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.rules-title.avc{color:var(--avc)}
+.rules-title.nvc{color:var(--nvc)}
+.rules-title.accent{color:#f5a042}
+.rules-title.red{color:var(--accent)}
+.rules-title.purple{color:#a060c0}
+.rules-conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rules-conf{border-radius:var(--r);padding:10px 12px;border:1px solid}
+.rules-conf.avc{background:var(--avc-bg);border-color:var(--avc-dim)}
+.rules-conf.nvc{background:var(--nvc-bg);border-color:var(--nvc-dim)}
+.rules-conf-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;margin-bottom:4px}
+.rules-conf.avc .rules-conf-name{color:var(--avc)}
+.rules-conf.nvc .rules-conf-name{color:var(--nvc)}
+.rules-conf-pools{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.7}
+.rules-phase{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rules-phase-num{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--muted);padding-top:2px}
+.rules-phase-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.rules-phase-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:5px}
+.rules-phase-time{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.rules-games-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rules-gbox{background:var(--surface2);border-radius:var(--r);padding:10px 6px;text-align:center;border:1px solid var(--border)}
+.rules-gnum{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1}
+.rules-glbl{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:3px;line-height:1.4}
+.rules-gteams{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;margin-top:5px;padding-top:5px;border-top:1px solid var(--border)}
+.rules-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;align-items:baseline}
+.rules-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:4px}
+.rules-text{color:var(--muted);line-height:1.6}
+.rules-text b{color:var(--text);font-weight:500}
+.rules-score-grid{display:flex;flex-direction:column;gap:4px}
+.rules-score-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:6px 10px;background:var(--surface2);border-radius:var(--r);border:1px solid var(--border)}
+.rules-score-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);flex-shrink:0}
+.rules-score-val{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);font-weight:500;text-align:right}
+/* light theme overrides for rules */
+body.light .rules-section{background:#fff;border-color:var(--border)}
+body.light .rules-score-row{background:var(--surface2)}
+body.light .rules-gbox{background:var(--surface2)}
+body.light .rules-phase-time{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -66,6 +106,7 @@
   <button class="tab-btn" onclick="showTab('standings',this)">Standings</button>
   <button class="tab-btn" onclick="showTab('wildcard',this)">Wildcard</button>
   <button class="tab-btn" onclick="showTab('bracket',this)">Bracket</button>
+  <button class="tab-btn" onclick="showTab('rules',this)">Rules</button>
 </div>
 
 <div class="tab-pane active" id="tab-schedule">
@@ -80,6 +121,138 @@
 <div class="tab-pane" id="tab-bracket">
   <div id="bracketView"><div class="no-data"><div class="no-data-big">STANDBY</div><p>Bracket seeding updates live after Phase 2</p></div></div>
 </div>
+
+<!-- FORMAT & RULES TAB -->
+<div class="tab-pane" id="tab-rules">
+
+  <!-- HEADER -->
+  <div style="margin-bottom:20px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;background:linear-gradient(135deg,var(--avc) 0%,#fff 50%,var(--nvc) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:4px">SuperVolley</div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">FVL Spring 2026 · Format &amp; Rules</div>
+  </div>
+
+  <!-- DIVISIONS -->
+  <div class="rules-section">
+    <div class="rules-title avc">Conferences</div>
+    <div class="rules-conf-grid">
+      <div class="rules-conf avc">
+        <div class="rules-conf-name">AVC</div>
+        <div class="rules-conf-pools">American Volleyball Conference<br>Fowler Pool · Central Pool<br>8 teams</div>
+      </div>
+      <div class="rules-conf nvc">
+        <div class="rules-conf-name">NVC</div>
+        <div class="rules-conf-pools">National Volleyball Conference<br>Dobbs Pool · Extreme Pool<br>8 teams</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASES -->
+  <div class="rules-section">
+    <div class="rules-title accent">Tournament Format</div>
+
+    <div class="rules-phase">
+      <div class="rules-phase-num">1</div>
+      <div class="rules-phase-body">
+        <div class="rules-phase-name">Qualifiers — Pool Play</div>
+        <div class="rules-phase-desc">Full round-robin within your pool — every team plays all 3 opponents. Pool winner automatically qualifies for the division bracket. No elimination in this phase.</div>
+        <div class="rules-phase-time">8:30am – 1:30pm</div>
+      </div>
+    </div>
+
+    <div class="rules-phase">
+      <div class="rules-phase-num">2</div>
+      <div class="rules-phase-body">
+        <div class="rules-phase-name">Wildcard Round</div>
+        <div class="rules-phase-desc">All 16 teams play 1 randomly drawn cross-pool game within their division. The top 2 non-qualified teams per division (by combined Phase 1 + Phase 2 record) earn the 2 wildcard spots into the bracket.</div>
+        <div class="rules-phase-time">1:30pm – 3:20pm</div>
+      </div>
+    </div>
+
+    <div class="rules-phase">
+      <div class="rules-phase-num">3</div>
+      <div class="rules-phase-body">
+        <div class="rules-phase-name">Division Brackets</div>
+        <div class="rules-phase-desc">4 teams per division — 2 auto-qualified + 2 wildcards. Seeded 1–4 by combined record. Seed 1 vs Seed 4 · Seed 2 vs Seed 3. Division Final decides the conference champion. AVC and NVC brackets run simultaneously.</div>
+        <div class="rules-phase-time">3:20pm – 4:55pm</div>
+      </div>
+    </div>
+
+    <div class="rules-phase" style="border-bottom:none">
+      <div class="rules-phase-num" style="color:var(--accent)">★</div>
+      <div class="rules-phase-body">
+        <div class="rules-phase-name" style="color:var(--accent)">SuperVolley Final</div>
+        <div class="rules-phase-desc">AVC Champion vs NVC Champion. One game. Champion of Champions crowned.</div>
+        <div class="rules-phase-time">4:55pm – 5:20pm</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAMES PER TEAM -->
+  <div class="rules-section">
+    <div class="rules-title nvc">Games Per Team</div>
+    <div class="rules-games-grid">
+      <div class="rules-gbox">
+        <div class="rules-gnum" style="color:var(--muted)">4</div>
+        <div class="rules-glbl">Did not qualify</div>
+        <div class="rules-gteams" style="color:var(--muted)">8 teams</div>
+      </div>
+      <div class="rules-gbox">
+        <div class="rules-gnum" style="color:var(--nvc)">5</div>
+        <div class="rules-glbl">SF exit</div>
+        <div class="rules-gteams" style="color:var(--nvc)">4 teams</div>
+      </div>
+      <div class="rules-gbox">
+        <div class="rules-gnum" style="color:var(--avc)">6</div>
+        <div class="rules-glbl">Div final exit</div>
+        <div class="rules-gteams" style="color:var(--avc)">2 teams</div>
+      </div>
+      <div class="rules-gbox">
+        <div class="rules-gnum" style="color:var(--accent)">7</div>
+        <div class="rules-glbl">SuperVolley finalists</div>
+        <div class="rules-gteams" style="color:var(--accent)">2 teams</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WILDCARD RULES -->
+  <div class="rules-section">
+    <div class="rules-title accent">Wildcard Qualification</div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text">Ranked by combined Phase 1 + Phase 2 win-loss record</div></div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text">Pool winners are already qualified and excluded from the wildcard race</div></div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text"><b>Tiebreaker:</b> point differential across all games (capped per game to prevent score-running)</div></div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text"><b>2nd tiebreaker:</b> head-to-head result · <b>Final:</b> coin flip</div></div>
+  </div>
+
+  <!-- BRACKET SEEDING -->
+  <div class="rules-section">
+    <div class="rules-title nvc">Bracket Seeding</div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text">All 4 bracket teams (qualified + wildcard) ranked together by combined record</div></div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text">No protected seeds — pool winners can be seeded 3 or 4 if their record warrants it</div></div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text"><b>Semifinal matchups:</b> Seed 1 vs Seed 4 · Seed 2 vs Seed 3</div></div>
+  </div>
+
+  <!-- VOLLEYBALL RULES -->
+  <div class="rules-section">
+    <div class="rules-title red">Volleyball Scoring</div>
+    <div class="rules-score-grid">
+      <div class="rules-score-row"><span class="rules-score-key">Scoring system</span><span class="rules-score-val">Rally — every serve scores a point</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Win condition</span><span class="rules-score-val">First to 21 points</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Deuce triggers at</span><span class="rules-score-val">20 – 20</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Deuce rule</span><span class="rules-score-val">Must win by 2 clear points</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Hard cap</span><span class="rules-score-val">25 pts — first to 25 wins outright, no 2-pt gap needed</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Pool &amp; wildcard</span><span class="rules-score-val">25-min time cap — leader wins at the buzzer</span></div>
+      <div class="rules-score-row"><span class="rules-score-key">Bracket games</span><span class="rules-score-val">No time cap — play to completion</span></div>
+    </div>
+  </div>
+
+  <!-- BREAK -->
+  <div class="rules-section" style="margin-bottom:0">
+    <div class="rules-title purple">Scheduled Break</div>
+    <div class="rules-row"><div class="rules-dot"></div><div class="rules-text"><b>11:00am – 11:10am</b> — 10-minute break, both courts stand down simultaneously</div></div>
+    <div class="rules-row" style="border-bottom:none"><div class="rules-dot"></div><div class="rules-text">All games resume at 11:10am sharp</div></div>
+  </div>
+
+</div><!-- end tab-rules -->
 
 <div class="last-updated" id="lastUpdated">Connecting to live feed…</div>
 
