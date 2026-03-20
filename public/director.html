@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperVolley — Director</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:28px 24px;width:100%;max-width:320px}
+.login-eyebrow{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;text-align:center}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;line-height:1;background:linear-gradient(135deg,var(--avc) 0%,#fff 50%,var(--nvc) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:20px}
+.login-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:block}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px;text-align:center;letter-spacing:.08em}
+.login-input:focus{border-color:var(--avc)}
+.login-btn{width:100%;background:var(--avc);color:#000;border:none;border-radius:var(--r);padding:11px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.login-btn:hover{background:#ffd966}
+.login-error{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);text-align:center;margin-top:8px;min-height:16px}
+/* DIRECTOR BANNER */
+.director-banner{background:var(--avc-bg);border-bottom:1px solid var(--avc-dim);padding:7px 18px;display:flex;justify-content:space-between;align-items:center}
+.db-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--avc);letter-spacing:.08em;text-transform:uppercase}
+.db-status{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--win)}
+.sync-dot.saving{background:var(--avc);animation:blink .5s infinite}
+.sync-dot.error{background:var(--accent)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);background:none;border:1px solid var(--border2);border-radius:var(--r);padding:3px 8px;cursor:pointer}
+.logout-btn:hover{color:var(--accent);border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-eyebrow">FVL Spring 2026 Tournament</div>
+    <div class="login-title">SuperVolley</div>
+    <label class="login-label">Director password</label>
+    <input type="password" class="login-input" id="loginInput" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Enter Director View →</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until logged in) -->
+<div id="mainApp" style="display:none">
+
+<div class="director-banner">
+  <span class="db-label">⚡ Director View — FVL Spring 2026</span>
+  <div class="db-status">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncLabel">Synced</span>
+    <button class="logout-btn" onclick="doLogout()">Log out</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="logo-eyebrow">FVL Spring 2026 Tournament</div>
+      <div class="logo-title">SuperVolley</div>
+      <div class="logo-sub">Tournament Director · 8:30am – 5:30pm</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+          <span class="theme-icon" id="themeIcon">☀</span>
+          <span id="themeLabel">Light</span>
+        </button>
+        <button class="info-btn" onclick="openModal()" title="Format &amp; Rules">?</button>
+      </div>
+      <div class="hero-meta">16 teams · 2 courts<br>AVC &amp; NVC</div>
+    </div>
+  </div>
+  <div class="div-pills">
+    <div class="div-pill avc">AVC — Fowler &amp; Central</div>
+    <div class="div-pill nvc">NVC — Dobbs &amp; Extreme</div>
+  </div>
+  <div class="steps">
+    <button class="step-tab active" id="tab-0" onclick="goTo(0)">01 Teams</button>
+    <button class="step-tab" id="tab-1" onclick="goTo(1)" disabled>02 Draw</button>
+    <button class="step-tab" id="tab-2" onclick="goTo(2)" disabled>03 Schedule</button>
+    <button class="step-tab" id="tab-3" onclick="goTo(3)" disabled>04 Standings</button>
+    <button class="step-tab" id="tab-4" onclick="goTo(4)" disabled>05 Bracket</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section active" id="sec-0">
+    <div class="search-bar">
+      <input type="text" id="teamSearch" placeholder="Search team or captain…" oninput="searchTeams(this.value)" style="max-width:220px">
+      <span class="match-count" id="matchCount">16 teams · 8 AVC · 8 NVC</span>
+    </div>
+    <div class="team-list" id="teamList"></div>
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="validateAndNext()">Draw Pools →</button>
+      <button class="btn btn-ghost" onclick="resetTeams()">↺ Reset FVL teams</button>
+    </div>
+  </div>
+
+  <div class="section" id="sec-1">
+    <div class="draw-controls">
+      <button class="btn btn-primary" onclick="randomDraw()">↺ Randomize Draw</button>
+      <button class="btn btn-ghost" onclick="goTo(0)">← Edit Teams</button>
+    </div>
+    <div class="draw-grid" id="drawResult">
+      <div class="empty-state" style="grid-column:span 2"><div class="empty-big">DRAW</div><p>Hit Randomize to assign pools</p></div>
+    </div>
+    <div id="drawActions" style="display:none;margin-top:4px">
+      <button class="btn btn-primary" onclick="goTo(2)">Choose Schedule →</button>
+    </div>
+  </div>
+
+  <div class="section" id="sec-2">
+    <div class="sched-mode-toggle">
+      <div class="mode-card selected" id="modeA" onclick="selectMode('A')">
+        <div class="mode-check">✓</div>
+        <div class="mode-badge badge-a">Schedule A</div>
+        <div class="mode-title">Sequential Pools</div>
+        <div class="mode-desc">AVC first (8:30–11), NVC follows (11:10–1:30).</div>
+      </div>
+      <div class="mode-card" id="modeB" onclick="selectMode('B')">
+        <div class="mode-check">✓</div>
+        <div class="mode-badge badge-b">Schedule B</div>
+        <div class="mode-title">All-Day Spread</div>
+        <div class="mode-desc">All 4 pools rotate across both courts all morning.</div>
+      </div>
+    </div>
+    <div class="summary-bar">
+      <div><div class="s-num">39</div><div class="s-lbl">Total games</div></div>
+      <div><div class="s-num">4–7</div><div class="s-lbl">Per team</div></div>
+      <div><div class="s-num" style="font-size:14px;color:#a060c0">11:00</div><div class="s-lbl">Break</div></div>
+      <div class="sep"></div>
+      <div><div class="s-num" style="font-size:14px;color:var(--muted)">8:30am</div><div class="s-lbl">Tip-off</div></div>
+      <div><div class="s-num" style="font-size:14px;color:var(--muted)">5:20pm</div><div class="s-lbl">SuperVolley</div></div>
+    </div>
+    <div class="filter-bar">
+      <button class="fbtn active" onclick="filterSched('all',this)">All</button>
+      <button class="fbtn" onclick="filterSched('p1',this)">Phase 1</button>
+      <button class="fbtn" onclick="filterSched('p2',this)">Phase 2</button>
+      <button class="fbtn" onclick="filterSched('c1',this)">Court 1</button>
+      <button class="fbtn" onclick="filterSched('c2',this)">Court 2</button>
+    </div>
+    <div id="scheduleView"></div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="goTo(3)">View Standings →</button></div>
+  </div>
+
+  <div class="section" id="sec-3">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);letter-spacing:.06em">Live Standings</div>
+      <button class="btn btn-ghost" style="font-size:10px;padding:6px 10px" onclick="refreshStandings()">↺ Refresh</button>
+    </div>
+    <div id="standingsView"></div>
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="goTo(4)">View Bracket →</button></div>
+  </div>
+
+  <div class="section" id="sec-4">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);letter-spacing:.06em">Championship Bracket</div>
+      <button class="btn btn-ghost" style="font-size:10px;padding:6px 10px" onclick="renderBracket()">↺ Refresh</button>
+    </div>
+    <div id="bracketView"></div>
+  </div>
+</div>
+
+<!-- MODAL (same as before) -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-eyebrow">FVL Spring 2026 Tournament</div><div class="modal-title">SuperVolley</div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="m-section">
+        <div class="m-section-title avc">Tournament Overview</div>
+        <div class="m-conf-grid">
+          <div class="m-conf avc"><div class="m-conf-name">AVC</div><div class="m-conf-pools">American Volleyball Conference<br>Fowler Pool · Central Pool<br>8 teams total</div></div>
+          <div class="m-conf nvc"><div class="m-conf-name">NVC</div><div class="m-conf-pools">National Volleyball Conference<br>Dobbs Pool · Extreme Pool<br>8 teams total</div></div>
+        </div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title accent">Tournament Phases</div>
+        <div class="m-phase"><div class="m-phase-num">1</div><div><div class="m-phase-name">Qualifiers — Pool Play</div><div class="m-phase-desc">Full round-robin in each pool. 3 games per team. Pool winner auto-qualifies for division bracket.</div></div><div class="m-phase-time">8:30am<br>1:30pm</div></div>
+        <div class="m-phase"><div class="m-phase-num">2</div><div><div class="m-phase-name">Wildcard Round</div><div class="m-phase-desc">All 16 teams play 1 random cross-pool game within division. Top 2 non-qualifiers per division earn wildcard spots.</div></div><div class="m-phase-time">1:30pm<br>3:20pm</div></div>
+        <div class="m-phase"><div class="m-phase-num">3</div><div><div class="m-phase-name">Division Brackets</div><div class="m-phase-desc">4 teams per division seeded 1–4 by combined record. SF → Division Final. Both run simultaneously.</div></div><div class="m-phase-time">3:20pm<br>4:55pm</div></div>
+        <div class="m-phase"><div class="m-phase-num">★</div><div><div class="m-phase-name">SuperVolley Final</div><div class="m-phase-desc">AVC Champion vs NVC Champion. Champion of Champions crowned.</div></div><div class="m-phase-time">4:55pm<br>5:20pm</div></div>
+      </div>
+      <div class="m-section">
+        <div class="m-section-title red">Volleyball Scoring Rules</div>
+        <div class="m-scoring">
+          <div class="m-score-row"><span class="m-score-key">Scoring</span><span class="m-score-val">Rally — every serve scores</span></div>
+          <div class="m-score-row"><span class="m-score-key">Win condition</span><span class="m-score-val">First to 21 points</span></div>
+          <div class="m-score-row"><span class="m-score-key">Deuce</span><span class="m-score-val">20–20 → win by 2</span></div>
+          <div class="m-score-row"><span class="m-score-key">Hard cap</span><span class="m-score-val">25 pts — first to 25 wins outright</span></div>
+          <div class="m-score-row"><span class="m-score-key">Pool &amp; wildcard</span><span class="m-score-val">25-min time cap — leader wins</span></div>
+          <div class="m-score-row"><span class="m-score-key">Bracket games</span><span class="m-score-val">No time cap — play to completion</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div><!-- end mainApp -->
+
+<script src="/tournament.js"></script>
+<script>
+// ── AUTH ──────────────────────────────────────────────
+let directorToken = sessionStorage.getItem('sv_token') || null;
+
+async function doLogin() {
+  const pw = document.getElementById('loginInput').value;
+  const err = document.getElementById('loginError');
+  if (!pw) { err.textContent = 'Enter the password'; return; }
+  try {
+    const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password:pw}) });
+    if (r.ok) {
+      const { token } = await r.json();
+      directorToken = token;
+      sessionStorage.setItem('sv_token', token);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      loadStateFromServer();
+    } else {
+      err.textContent = 'Wrong password — try again';
+      document.getElementById('loginInput').value = '';
+    }
+  } catch { err.textContent = 'Server error — is the server running?'; }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('sv_token');
+  directorToken = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('mainApp').style.display = 'none';
+}
+
+// Try auto-login with stored token
+if (directorToken) {
+  fetch('/api/state', { headers:{'x-director-token': directorToken} })
+    .then(r => r.ok ? r.json() : null)
+    .then(state => {
+      if (state) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        applyState(state);
+      } else { directorToken = null; sessionStorage.removeItem('sv_token'); }
+    }).catch(() => {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+    });
+} else {
+  // Not logged in — show login screen, still visible
+}
+
+// ── STATE SYNC ────────────────────────────────────────
+let saveTimer = null;
+let syncState = 'idle'; // idle | saving | error
+
+function setSyncStatus(s, label) {
+  syncState = s;
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (s === 'saving' ? ' saving' : s === 'error' ? ' error' : '');
+  lbl.textContent = label;
+}
+
+async function loadStateFromServer() {
+  try {
+    const r = await fetch('/api/state');
+    const state = await r.json();
+    applyState(state);
+  } catch { setSyncStatus('error', 'Load failed'); }
+}
+
+function applyState(serverState) {
+  if (!serverState) return;
+  if (serverState.teams && serverState.teams.length) {
+    teams = serverState.teams;
+    initTeamList();
+  }
+  if (serverState.pools) {
+    pools = serverState.pools;
+    renderDraw();
+    document.getElementById('drawActions').style.display = 'block';
+    ['tab-1','tab-2','tab-3','tab-4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
+  }
+  if (serverState.schedule && serverState.schedule.length) {
+    schedule = serverState.schedule;
+    schedMode = serverState.schedMode || 'A';
+    document.getElementById('modeA').classList.toggle('selected', schedMode === 'A');
+    document.getElementById('modeB').classList.toggle('selected', schedMode === 'B');
+    renderSchedule(activeFilter);
+  }
+  if (serverState.gameScores) gameScores = serverState.gameScores;
+  if (serverState.bracketScores) bracketScores = serverState.bracketScores;
+  if (serverState.step !== undefined) {
+    // restore step silently without re-triggering builds
+  }
+  setSyncStatus('idle', 'Synced');
+}
+
+async function saveStateNow() {
+  if (!directorToken) return;
+  setSyncStatus('saving', 'Saving…');
+  try {
+    const body = { teams, pools, schedule, schedMode, gameScores, bracketScores };
+    const r = await fetch('/api/state', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'x-director-token': directorToken },
+      body: JSON.stringify(body)
+    });
+    if (r.ok) setSyncStatus('idle', 'Saved');
+    else setSyncStatus('error', 'Save failed');
+  } catch { setSyncStatus('error', 'Offline'); }
+}
+
+// Debounced save — fires 1s after last change
+function debouncedSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveStateNow, 1000);
+}
+
+// Lightweight score patch — fires immediately for score changes
+async function patchScores() {
+  if (!directorToken) return;
+  setSyncStatus('saving', 'Saving…');
+  try {
+    const r = await fetch('/api/scores', {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'x-director-token': directorToken },
+      body: JSON.stringify({ gameScores, bracketScores })
+    });
+    if (r.ok) setSyncStatus('idle', 'Saved');
+    else setSyncStatus('error', 'Save failed');
+  } catch { setSyncStatus('error', 'Offline'); }
+}
+
+// ── APP STATE ─────────────────────────────────────────
+let teams = FVL_TEAMS.map(t => ({...t, div: getDiv(t.captain)}));
+let pools = null;
+let schedule = [];
+let schedMode = 'A';
+let activeFilter = 'all';
+let gameScores = {};
+let bracketScores = {};
+let isLight = false;
+
+// ── TEAMS ─────────────────────────────────────────────
+function initTeamList() { renderTeamList(teams); }
+function renderTeamList(list) {
+  document.getElementById('teamList').innerHTML = list.map(t => {
+    const i = teams.indexOf(t), dc = t.div==='AVC'?'avc':'nvc';
+    return `<div class="team-row ${dc}-team">
+      <div class="team-num">T${String(i+1).padStart(2,'0')}<br><span class="div-tag ${dc}">${t.div}</span></div>
+      <div class="field-col"><div class="field-hint">Team</div><input type="text" value="${t.name}" oninput="teams[${i}].name=this.value;debouncedSave()"/></div>
+      <div class="field-col"><div class="field-hint">Captain</div><input type="text" value="${t.captain}" oninput="teams[${i}].captain=this.value;debouncedSave()"/></div>
+    </div>`;
+  }).join('');
+  const avc = list.filter(t=>t.div==='AVC').length, nvc = list.filter(t=>t.div==='NVC').length;
+  document.getElementById('matchCount').textContent = `${list.length} teams · ${avc} AVC · ${nvc} NVC`;
+}
+function searchTeams(q) {
+  if (!q.trim()) { renderTeamList(teams); return; }
+  const lq = q.toLowerCase();
+  renderTeamList(teams.filter(t => t.name.toLowerCase().includes(lq) || t.captain.toLowerCase().includes(lq) || t.div.toLowerCase().includes(lq)));
+}
+function resetTeams() {
+  teams = FVL_TEAMS.map(t => ({...t, div: getDiv(t.captain)}));
+  document.getElementById('teamSearch').value = '';
+  initTeamList();
+  debouncedSave();
+  toast('Reset to FVL Spring 2026 teams');
+}
+
+// ── NAV ───────────────────────────────────────────────
+function goTo(step) {
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===step));
+  document.querySelectorAll('.step-tab').forEach((t,i) => {
+    t.classList.remove('active','done');
+    if (i===step) t.classList.add('active');
+    else if (i<step) t.classList.add('done');
+  });
+  if (step===2) buildSchedule();
+  if (step===3) { renderStandings(); renderWildcardStandings(); }
+  if (step===4) renderBracket();
+}
+function validateAndNext() {
+  const miss = teams.filter(t => !t.name.trim()).length;
+  if (miss) { toast(`${miss} team name${miss>1?'s':''} missing`); return; }
+  document.getElementById('tab-1').disabled = false;
+  goTo(1);
+}
+
+// ── DRAW ──────────────────────────────────────────────
+function randomDraw() {
+  const aT = shuffle(teams.filter(t=>t.div==='AVC'));
+  const nT = shuffle(teams.filter(t=>t.div==='NVC'));
+  pools = { AVC:{Fowler:aT.slice(0,4),Central:aT.slice(4,8)}, NVC:{Dobbs:nT.slice(0,4),Extreme:nT.slice(4,8)} };
+  gameScores = {}; bracketScores = {};
+  renderDraw();
+  document.getElementById('drawActions').style.display = 'block';
+  ['tab-2','tab-3','tab-4'].forEach(id => document.getElementById(id).disabled = false);
+  debouncedSave();
+  toast('Pools drawn!');
+}
+function poolBlock(tList, pName, color) {
+  return `<div class="pool-block"><div class="pool-name" style="color:${color}">${pName} Pool</div>${tList.map(t=>`<div class="pool-team-row"><span class="pt-name">${t.name}</span><span class="pt-cap">${t.captain}</span></div>`).join('')}</div>`;
+}
+function renderDraw() {
+  document.getElementById('drawResult').innerHTML = `
+    <div class="conf-block avc pop">
+      <div class="conf-header"><div><div class="conf-name">AVC</div><div class="conf-sub">American Volleyball Conference</div></div><div class="conf-sub">8 teams</div></div>
+      ${poolBlock(pools.AVC.Fowler,'Fowler','#f5c842')}${poolBlock(pools.AVC.Central,'Central','#e8a820')}
+    </div>
+    <div class="conf-block nvc pop">
+      <div class="conf-header"><div><div class="conf-name">NVC</div><div class="conf-sub">National Volleyball Conference</div></div><div class="conf-sub">8 teams</div></div>
+      ${poolBlock(pools.NVC.Dobbs,'Dobbs','#42b8f5')}${poolBlock(pools.NVC.Extreme,'Extreme','#20a0e8')}
+    </div>`;
+}
+
+// ── SCHEDULE ──────────────────────────────────────────
+function selectMode(m) {
+  schedMode = m;
+  document.getElementById('modeA').classList.toggle('selected', m==='A');
+  document.getElementById('modeB').classList.toggle('selected', m==='B');
+  gameScores = {};
+  buildSchedule();
+}
+function buildSchedule() {
+  if (!pools) return;
+  schedule = buildScheduleFromPools(pools, schedMode);
+  renderSchedule(activeFilter);
+  debouncedSave();
+}
+function filterSched(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchedule(f);
+}
+function renderSchedule(filter) {
+  const el = document.getElementById('scheduleView');
+  if (!schedule.length) { el.innerHTML = '<div class="empty-state"><div class="empty-big">NO SCHEDULE</div></div>'; return; }
+  const sorted = [...schedule].sort((a,b) => a.time-b.time||(a.isBreak?-1:1));
+  const phases = [
+    {id:'p1',label:'Qualifiers — Pool play',time:'8:30am – 1:30pm',badge:'b-p1',bl:'Phase 1'},
+    {id:'p2',label:'Wildcard round',time:'1:30pm – 3:20pm',badge:'b-p2',bl:'Phase 2'},
+  ];
+  let html = '';
+  for (const ph of phases) {
+    let games = sorted.filter(g => g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
+    if (filter==='c1') games = sorted.filter(g=>(g.phase===ph.id&&g.court===1)||(ph.id==='p1'&&g.phase==='break'));
+    else if (filter==='c2') games = sorted.filter(g=>(g.phase===ph.id&&g.court===2)||(ph.id==='p1'&&g.phase==='break'));
+    else if (filter===ph.id) games = sorted.filter(g=>g.phase===ph.id||(ph.id==='p1'&&g.phase==='break'));
+    if (!games.filter(g=>!g.isBreak).length) continue;
+    html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;
+    let brkDone = false;
+    for (const g of games) {
+      if (g.isBreak) { if(!brkDone){html+=`<div class="break-row"><span class="break-icon">⏸ BREAK</span><span class="break-label">10-minute break — both courts</span><span class="break-time">${timeStr(g.time)} – ${timeStr(g.time+10)}</span></div>`;brkDone=true;} continue; }
+      const s = gameScores[g.id]||{};
+      const hS = s.home===''||s.home===undefined?null:+s.home, aS = s.away===''||s.away===undefined?null:+s.away;
+      const hasResult = hS!==null&&aS!==null&&hS!==aS;
+      const diff = hasResult?Math.abs(hS-aS):null;
+      const cc = g.court===1?'c1':'c2';
+      html += `<div class="game-row${hasResult?hS>aS?' home-win':' away-win':''}" id="row-${g.id}">
+        <div class="game-top">
+          <span class="gr-time">${timeStr(g.time)}</span><span class="gr-court ${cc}">C${g.court}</span>
+          <span class="gr-home">${g.home}</span><span class="gr-vs">vs</span><span class="gr-away">${g.away}</span>
+          <span></span><span></span><span class="gr-tag">${g.tag}</span>
+        </div>
+        <div class="game-bottom">
+          <span></span><span></span>
+          <span class="cap-home">${g.homeCap}</span><span></span><span class="cap-away">${g.awayCap}</span>
+          <span></span><span></span>
+          <div class="score-inputs">
+            <input type="number" min="0" max="25" placeholder="–" value="${s.home!==undefined?s.home:''}" oninput="onScoreChange('${g.id}','home',this.value)">
+            <span class="score-sep">:</span>
+            <input type="number" min="0" max="25" placeholder="–" value="${s.away!==undefined?s.away:''}" oninput="onScoreChange('${g.id}','away',this.value)">
+            <span class="diff-badge${diff!==null?' has-result':''}">${diff!==null?'+'+diff:'–'}</span>
+          </div>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+// ── SCORES ────────────────────────────────────────────
+function onScoreChange(gameId, side, val) {
+  if (!gameScores[gameId]) gameScores[gameId] = {home:'',away:''};
+  gameScores[gameId][side] = val===''?'':parseInt(val)||0;
+  const el = document.getElementById('row-'+gameId);
+  if (el) {
+    const s = gameScores[gameId];
+    const hS = s.home===''?null:+s.home, aS = s.away===''?null:+s.away;
+    const hasResult = hS!==null&&aS!==null&&hS!==aS;
+    el.className = 'game-row'+(hasResult?hS>aS?' home-win':' away-win':'');
+    const db = el.querySelector('.diff-badge');
+    if (db) { if(hasResult){db.textContent='+'+Math.abs(hS-aS);db.className='diff-badge has-result';}else{db.textContent='–';db.className='diff-badge';} }
+  }
+  patchScores();
+}
+function onBracketScoreChange(bid, side, val) {
+  if (!bracketScores[bid]) bracketScores[bid] = {home:'',away:''};
+  bracketScores[bid][side] = val===''?'':parseInt(val)||0;
+  updateBracketRow(bid);
+  patchScores();
+}
+function updateBracketRow(bid) {
+  const el = document.getElementById('brow-'+bid);
+  if (!el) return;
+  const s = bracketScores[bid]||{};
+  const hS=s.home===''?null:+s.home, aS=s.away===''?null:+s.away;
+  const hasResult = hS!==null&&aS!==null&&hS!==aS;
+  el.querySelector('.home-team')?.classList.toggle('winner', hasResult&&hS>aS);
+  el.querySelector('.home-team')?.classList.toggle('loser', hasResult&&hS<=aS);
+  el.querySelector('.away-team')?.classList.toggle('winner', hasResult&&aS>hS);
+  el.querySelector('.away-team')?.classList.toggle('loser', hasResult&&aS<=hS);
+  const hScoreEl = el.querySelector('.home-score');
+  const aScoreEl = el.querySelector('.away-score');
+  if (hScoreEl) { hScoreEl.className='bg-score-val home-score'+(hasResult?hS>aS?' winner':' loser':''); }
+  if (aScoreEl) { aScoreEl.className='bg-score-val away-score'+(hasResult?aS>hS?' winner':' loser':''); }
+  const db = el.querySelector('.bg-diff');
+  if (db) { if(hasResult){db.textContent='+'+Math.abs(hS-aS);db.className='bg-diff has';}else{db.textContent='';db.className='bg-diff';} }
+}
+
+// ── STANDINGS ─────────────────────────────────────────
+function renderStandings() {
+  if (!pools) { document.getElementById('standingsView').innerHTML='<div class="empty-state"><div class="empty-big">NO DRAW</div></div>'; return; }
+  document.getElementById('standingsView').innerHTML = renderPoolStandingsHTML(pools, schedule, gameScores);
+}
+function renderWildcardStandings() {
+  if (!pools) return;
+  const el = document.getElementById('standingsView');
+  el.innerHTML += renderWildcardHTML(pools, schedule, gameScores);
+}
+function refreshStandings() {
+  document.getElementById('standingsView').innerHTML = '';
+  renderStandings();
+  renderWildcardStandings();
+  toast('Standings refreshed');
+}
+
+// ── BRACKET ───────────────────────────────────────────
+function renderBracket() {
+  if (!pools) { document.getElementById('bracketView').innerHTML='<div class="empty-state"><div class="empty-big">NO DRAW</div></div>'; return; }
+  let html = '';
+  ['AVC','NVC'].forEach(div => {
+    const seeds = getBracketSeeds(div, pools, schedule, gameScores);
+    const conf = div==='AVC'?'avc':'nvc';
+    const c = div==='AVC'?1:2;
+    const t3 = 420;
+    const mkBadge = (isA,isW) => isA?`<span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 4px;border-radius:3px;background:var(--avc-dim);color:var(--avc);margin-left:4px">AUTO</span>`
+      :isW?`<span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 4px;border-radius:3px;background:#3a2010;color:#f5a042;margin-left:4px">WILD</span>`:'';
+
+    const gameCard = (bid, home, away, tag, tVal) => {
+      const s = bracketScores[bid]||{};
+      const hS=s.home===''||!s.home?null:+s.home, aS=s.away===''||!s.away?null:+s.away;
+      const hasR = hS!==null&&aS!==null&&hS!==aS, diff = hasR?Math.abs(hS-aS):null;
+      const hCls=hasR?hS>aS?'winner':'loser':'', aCls=hasR?aS>hS?'winner':'loser':'';
+      return `<div class="bracket-game bg-${conf}" id="brow-${bid}"><div class="bg-inner">
+        <div class="bg-top">
+          <div class="bg-teams">
+            <div class="bg-team-row home-team ${hCls}"><div class="bg-seed">${home?home.seed:'?'}</div><div class="bg-team-info"><div class="bg-team-name">${home?home.name:'TBD'}${home?mkBadge(home.isAuto,home.isWC):''}</div><div class="bg-team-cap">${home?home.captain:''}</div></div></div>
+            <div class="bg-team-row away-team ${aCls}"><div class="bg-seed">${away?away.seed:'?'}</div><div class="bg-team-info"><div class="bg-team-name">${away?away.name:'TBD'}${away?mkBadge(away.isAuto,away.isWC):''}</div><div class="bg-team-cap">${away?away.captain:''}</div></div></div>
+          </div>
+          <div class="bg-score-col">
+            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.home||''}" oninput="onBracketScoreChange('${bid}','home',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val home-score ${hCls}"></div>
+            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.away||''}" oninput="onBracketScoreChange('${bid}','away',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val away-score ${aCls}"></div>
+          </div>
+        </div>
+        <div class="bg-meta"><span class="bg-tag">${tag}</span><div style="display:flex;align-items:center;gap:6px"><span class="bg-diff${diff?' has':''}">${diff?'+'+diff:''}</span><span class="bg-time-court">${timeStr(tVal)} · C${c}</span></div></div>
+      </div></div>`;
+    };
+
+    html += `<div class="bracket-section">
+      <div class="bracket-conf-header ${conf}"><span class="bracket-conf-name">${div} — ${div==='AVC'?'American Volleyball Conference':'National Volleyball Conference'}</span><span class="bracket-conf-sub">Seeded 1–4 by combined record</span></div>
+      <div style="height:8px"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Semifinal 1 · Seed 1 vs Seed 4</div>
+      ${gameCard(div+'-sf1',seeds[0],seeds[3],div+' Semifinal 1',t3)}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">Semifinal 2 · Seed 2 vs Seed 3</div>
+      ${gameCard(div+'-sf2',seeds[1],seeds[2],div+' Semifinal 2',t3+25)}
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">${div} Championship Final</div>
+      ${gameCard(div+'-final',null,null,div+' Championship Final',t3+50)}
+    </div>`;
+  });
+
+  // SuperVolley
+  const sv = bracketScores['supervolley']||{};
+  const shS=sv.home===''||!sv.home?null:+sv.home, saS=sv.away===''||!sv.away?null:+sv.away;
+  const svHasR=shS!==null&&saS!==null&&shS!==saS, svDiff=svHasR?Math.abs(shS-saS):null;
+  html += `<div class="supervolley-card">
+    <div class="sv-top"><div><div class="sv-eyebrow">FVL Spring 2026 · Champion of Champions</div><div class="sv-trophy">★ SuperVolley Final ★</div></div>
+    <div class="sv-right"><div class="sv-time">${timeStr(495)}</div><div class="sv-court">Centre court</div></div></div>
+    <div class="sv-teams">
+      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag avc">AVC Champion</div><div class="sv-team-name${svHasR&&shS>saS?' winner':''}">AVC Champion</div></div>
+      <div class="sv-score-area"><div class="sv-score-num${svHasR?shS>saS?' winner':' loser':''}">${shS!==null?shS:'–'}</div></div></div>
+      <div class="sv-div">vs</div>
+      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag nvc">NVC Champion</div><div class="sv-team-name${svHasR&&saS>shS?' winner':''}">NVC Champion</div></div>
+      <div class="sv-score-area"><div class="sv-score-num${svHasR?saS>shS?' winner':' loser':''}">${saS!==null?saS:'–'}</div></div></div>
+    </div>
+    <div class="sv-bottom">
+      <div class="sv-score-inputs">
+        <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-right:4px">AVC</span>
+        <input type="number" min="0" max="25" placeholder="–" value="${sv.home||''}" oninput="onBracketScoreChange('supervolley','home',this.value)">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);padding:0 4px">:</span>
+        <input type="number" min="0" max="25" placeholder="–" value="${sv.away||''}" oninput="onBracketScoreChange('supervolley','away',this.value)">
+        <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">NVC</span>
+      </div>
+      <span class="sv-diff${svDiff?' has':''}">${svDiff?'+'+svDiff+' pts':''}</span>
+    </div>
+  </div>`;
+  document.getElementById('bracketView').innerHTML = html;
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal(){document.getElementById('modalOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+// ── THEME ─────────────────────────────────────────────
+function toggleTheme(){
+  isLight=!isLight;
+  document.body.classList.toggle('light',isLight);
+  document.getElementById('themeIcon').textContent=isLight?'◑':'☀';
+  document.getElementById('themeLabel').textContent=isLight?'Dark':'Light';
+}
+
+// ── TOAST ─────────────────────────────────────────────
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+initTeamList();
+</script>
+</body>
+</html>
