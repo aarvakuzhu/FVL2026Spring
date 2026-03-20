@@ -471,6 +471,73 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   <div class="bracket-wrap" id="bracketContent"></div>
 </div>
 
+<!-- RULES -->
+<div class="screen" id="screen-rules">
+  <div style="padding:16px 14px">
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px">Tournament Phases<span style="flex:1;height:1px;background:rgba(29,156,240,.2);display:block"></span></div>
+      <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r2);overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid var(--rim)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-g);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;flex-shrink:0">1</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;flex:1">Qualifiers — Pool Play</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);background:var(--ink);border:1px solid var(--rim);border-radius:8px;padding:2px 8px;white-space:nowrap">8:30–1:30</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;padding-left:42px">Full round-robin in each pool. Pool winner auto-qualifies for the bracket.</div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--rim)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-g);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;flex-shrink:0">2</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;flex:1">Wildcard Round</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);background:var(--ink);border:1px solid var(--rim);border-radius:8px;padding:2px 8px;white-space:nowrap">1:30–3:20</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;padding-left:42px">1 cross-pool game. Top 2 non-qualifiers per division earn wildcard spots.</div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--rim)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--blue-g);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;flex-shrink:0">3</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;flex:1">Division Brackets</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);background:var(--ink);border:1px solid var(--rim);border-radius:8px;padding:2px 8px;white-space:nowrap">3:20–4:55</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;padding-left:42px">4 teams seeded 1–4 by combined record. SF (1v4, 2v3) → Division Final.</div>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--avc),var(--avc2));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">★</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;flex:1">SuperVolley Final</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text3);background:var(--ink);border:1px solid var(--rim);border-radius:8px;padding:2px 8px;white-space:nowrap">4:55–5:20</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;padding-left:42px">AVC Champion vs NVC Champion. Champion of Champions.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px">Games Per Team<span style="flex:1;height:1px;background:rgba(29,156,240,.2);display:block"></span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r);padding:14px 8px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--text4)">4</div><div style="font-size:10px;color:var(--text3);margin-top:4px">Didn't qualify</div></div>
+        <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r);padding:14px 8px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--nvc)">5</div><div style="font-size:10px;color:var(--text3);margin-top:4px">SF exit</div></div>
+        <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r);padding:14px 8px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--avc)">6</div><div style="font-size:10px;color:var(--text3);margin-top:4px">Div final exit</div></div>
+        <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r);padding:14px 8px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--blue)">7</div><div style="font-size:10px;color:var(--text3);margin-top:4px">Finalist</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:8px">Scoring Rules<span style="flex:1;height:1px;background:rgba(29,156,240,.2);display:block"></span></div>
+      <div style="background:var(--ink3);border:1px solid var(--rim);border-radius:var(--r2);overflow:hidden">
+        <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rim)"><span style="font-size:13px;color:var(--text2);flex:1">Win condition</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">First to 21</span></div>
+        <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rim)"><span style="font-size:13px;color:var(--text2);flex:1">Deuce at 20–20</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">Win by 2</span></div>
+        <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rim)"><span style="font-size:13px;color:var(--text2);flex:1">Hard cap</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">25 wins outright</span></div>
+        <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rim)"><span style="font-size:13px;color:var(--text2);flex:1">Pool &amp; wildcard</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">25-min cap</span></div>
+        <div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rim)"><span style="font-size:13px;color:var(--text2);flex:1">Bracket games</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">No time cap</span></div>
+        <div style="display:flex;align-items:center;padding:12px 16px"><span style="font-size:13px;color:var(--text2);flex:1">Break</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text)">11:00–11:10am</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showScreen('setup',this)">
@@ -492,6 +559,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   <button class="nav-btn" onclick="showScreen('bracket',this)">
     <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
     <span class="nav-lbl">Bracket</span>
+  </button>
+  <button class="nav-btn" onclick="showScreen('rules',this)">
+    <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span class="nav-lbl">Rules</span>
   </button>
 </nav>
 </div>
@@ -688,7 +759,7 @@ function buildTimeLane(){
   const tg={};
   filtered.filter(g=>!g.isBreak).forEach(g=>{if(!tg[g.time])tg[g.time]=[];tg[g.time].push(g);});
   const times=Object.keys(tg).map(Number).sort((a,b)=>a-b);
-  if(!selectedTime||!tg[selectedTime])selectedTime=times[0];
+  if(selectedTime===null||!tg[selectedTime])selectedTime=times[0];
 
   let laneHtml='';
   times.forEach(t=>{
@@ -705,7 +776,7 @@ function selectTime(t){selectedTime=t;buildTimeLane();}
 
 function renderCards(tg,t){
   const el=document.getElementById('cardsGrid');
-  if(!t||!tg[t]){el.innerHTML='';return;}
+  if(t===null||!tg[t]){el.innerHTML='';return;}
   const games=tg[t];
   let html=`<div class="cards-hdr"><div class="ch-time">${timeStr(t)}</div><div class="ch-line"></div><div class="ch-count">${games.length} game${games.length>1?'s':''}</div></div>`;
   html+='<div class="cards-grid">';

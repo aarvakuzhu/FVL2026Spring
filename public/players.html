@@ -945,7 +945,7 @@ function renderSchedule() {
     timeGroups[t].push(g);
   });
   const times = Object.keys(timeGroups).map(Number).sort((a,b)=>a-b);
-  if (!selectedTime || !timeGroups[selectedTime]) selectedTime = times[0];
+  if (selectedTime === null || !timeGroups[selectedTime]) selectedTime = times[0];
 
   // Build time lane
   const lane = document.getElementById('timeLane');
@@ -974,7 +974,7 @@ function renderSchedule() {
 
   // Build cards for selected time
   const cards = document.getElementById('cardsSection');
-  if (!selectedTime || !timeGroups[selectedTime]) { cards.innerHTML = ''; return; }
+  if (selectedTime === null || !timeGroups[selectedTime]) { cards.innerHTML = ''; return; }
 
   const curGames = timeGroups[selectedTime];
   let cardsHtml = `<div class="cards-time-header"><div class="cth-time">${timeStr(selectedTime)}</div><div class="cth-line"></div><div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">${curGames.length} game${curGames.length>1?'s':''}</div></div>`;
