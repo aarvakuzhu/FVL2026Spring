@@ -1010,6 +1010,7 @@ function renderSchedule() {
         </div>
         <div class="gcard-footer">
           <span class="gcard-caps">${g.homeCap} · ${g.awayCap}</span>
+          ${g.umpire ? `<span style="font-size:10px;color:var(--blue);font-weight:600">🏳 ${g.umpire}</span>` : ''}
           ${diff!==null?`<span class="diff-badge">+${diff}</span>`:''}
         </div>
       </div>
@@ -1047,7 +1048,7 @@ function openModal(gameId) {
   badge.className = `modal-court-badge c${g.court}`;
   badge.textContent = `Court ${g.court} · ${g.phase === 'p1' ? 'Phase 1' : 'Wildcard'}`;
   document.getElementById('modalPhase').textContent = g.tag;
-  document.getElementById('modalTitle').textContent = `${timeStr(g.time)}`;
+  document.getElementById('modalTitle').textContent = `${timeStr(g.time)}${g.umpire ? ' · 🏳 ' + g.umpire : ''}`;
 
   document.getElementById('scoreboardContent').innerHTML = `
     <div class="sb-team-row${hW?' winner':hasR?' loser':''}">

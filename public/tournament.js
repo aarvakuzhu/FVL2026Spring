@@ -92,6 +92,41 @@ function buildScheduleFromPools(pools, mode) {
     schedule.push(mkGame(p2Start + i*25, 1, as1[i], as2[i], 'Wildcard · AVC', 'p2'));
     schedule.push(mkGame(p2Start + i*25, 2, ns1[i], ns2[i], 'Wildcard · NVC', 'p2'));
   }
+
+  // ── UMPIRE ASSIGNMENT ──────────────────────────────
+  // All 16 captains pool
+  const allCaptains = [
+    ...pools.AVC.Fowler, ...pools.AVC.Central,
+    ...pools.NVC.Dobbs, ...pools.NVC.Extreme
+  ].map(t => t.captain);
+
+  // Track how many times each captain has umpired
+  const umpireCount = {};
+  allCaptains.forEach(c => umpireCount[c] = 0);
+
+  // Group real games by time slot
+  const byTime = {};
+  schedule.filter(g => !g.isBreak).forEach(g => {
+    if (!byTime[g.time]) byTime[g.time] = [];
+    byTime[g.time].push(g);
+  });
+
+  // For each time slot assign umpires
+  Object.keys(byTime).sort((a,b) => +a - +b).forEach(t => {
+    const games = byTime[t];
+    // Captains playing at this time slot
+    const busyCaps = new Set(games.flatMap(g => [g.homeCap, g.awayCap]));
+    // Available: not playing, sorted by least umpired first (shuffle for tiebreaking)
+    const available = shuffle(allCaptains.filter(c => !busyCaps.has(c)))
+      .sort((a,b) => umpireCount[a] - umpireCount[b]);
+
+    games.forEach((g, idx) => {
+      const ump = available[idx] || available[0] || '—';
+      g.umpire = ump;
+      if (ump !== '—') umpireCount[ump]++;
+    });
+  });
+
   return schedule;
 }
 

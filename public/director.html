@@ -654,6 +654,7 @@ function renderSchedule(filter) {
         <div class="game-bottom">
           <span></span><span></span>
           <span class="cap-home">${g.homeCap}</span><span></span><span class="cap-away">${g.awayCap}</span>
+          <span></span><span></span><span class="gr-tag" style="color:var(--nvc)">🏳 ${g.umpire||'—'}</span>
           <span></span><span></span>
           <div class="score-inputs">
             <input type="number" min="0" max="25" placeholder="–" value="${s.home!==undefined?s.home:''}" oninput="onScoreChange('${g.id}','home',this.value)">

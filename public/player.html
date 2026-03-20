@@ -396,6 +396,10 @@ function renderSchedule() {
           <span></span>
           <span class="cap-away">${g.awayCap}</span>
           <span></span><span></span>
+          <span class="gr-tag" style="color:var(--nvc)">🏳 ${g.umpire||'—'}</span>
+        </div>
+        <div class="game-bottom">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
           <div class="score-inputs" style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
             <span class="score-val-ro ${hScoreClass}">${hS !== null ? hS : '–'}</span>
             <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)">:</span>
