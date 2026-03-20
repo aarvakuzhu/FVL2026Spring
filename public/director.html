@@ -27,6 +27,27 @@
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .logout-btn{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);background:none;border:1px solid var(--border2);border-radius:var(--r);padding:3px 8px;cursor:pointer}
 .logout-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* DANGER BUTTON */
+.btn-danger{background:none;color:#f06060;border:1px solid #3a1515;font-family:'DM Mono',monospace;font-size:11px;border-radius:var(--r);padding:9px 15px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-danger:hover{background:#1a0808;border-color:#f06060;color:#ff8080}
+body.light .btn-danger{color:#c02020;border-color:#f0c0c0}
+body.light .btn-danger:hover{background:#fff0f0;border-color:#c02020}
+
+/* CONFIRM MODAL */
+.confirm-overlay{position:fixed;inset:0;background:rgba(4,4,12,.88);z-index:3000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
+.confirm-overlay.open{opacity:1;pointer-events:all}
+.confirm-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r3);padding:24px 22px;width:100%;max-width:340px}
+.confirm-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;margin-bottom:6px}
+.confirm-title.danger{color:#f06060}
+.confirm-title.warn{color:var(--avc)}
+.confirm-body{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.confirm-body b{color:var(--text);font-weight:500}
+.confirm-list{margin:8px 0 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.confirm-list li{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+.confirm-list li::before{content:'✕';color:#f06060;font-size:10px;flex-shrink:0}
+.confirm-actions{display:flex;gap:8px}
+.confirm-actions .btn{flex:1;justify-content:center}
 </style>
 </head>
 <body>
@@ -95,7 +116,7 @@
     <div class="team-list" id="teamList"></div>
     <div class="action-bar">
       <button class="btn btn-primary" onclick="validateAndNext()">Draw Pools →</button>
-      <button class="btn btn-ghost" onclick="resetTeams()">↺ Reset FVL teams</button>
+      <button class="btn btn-danger" onclick="confirmReset()">⚠ Full Reset</button>
     </div>
   </div>
 
@@ -148,7 +169,10 @@
       </select>
     </div>
     <div id="scheduleView"></div>
-    <div style="margin-top:12px"><button class="btn btn-primary" onclick="goTo(3)">View Standings →</button></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="goTo(3)">View Standings →</button>
+      <button class="btn btn-danger" onclick="confirmResetScores()">↺ Reset Scores</button>
+    </div>
   </div>
 
   <div class="section" id="sec-3">
@@ -163,7 +187,10 @@
   <div class="section" id="sec-4">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text);letter-spacing:.06em">Championship Bracket</div>
-      <button class="btn btn-ghost" style="font-size:10px;padding:6px 10px" onclick="renderBracket()">↺ Refresh</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" style="font-size:10px;padding:6px 10px" onclick="renderBracket()">↺ Refresh</button>
+        <button class="btn btn-danger" style="font-size:10px;padding:6px 10px" onclick="confirmResetScores()">↺ Reset Scores</button>
+      </div>
     </div>
     <div id="bracketView"></div>
   </div>
@@ -231,6 +258,47 @@
         <div class="m-rule" style="border-bottom:none"><div class="m-rule-dot"></div><div class="m-rule-text">All games resume at 11:10am sharp</div></div>
       </div>
       <div style="text-align:center;padding-top:12px;font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">FVL Spring 2026 · SuperVolley · Director View</div>
+    </div>
+  </div>
+</div>
+
+<!-- FULL RESET CONFIRM -->
+<div class="confirm-overlay" id="confirmReset" onclick="closeConfirm('confirmReset')">
+  <div class="confirm-card" onclick="event.stopPropagation()">
+    <div class="confirm-title danger">⚠ Full Reset</div>
+    <div class="confirm-body">
+      This will wipe everything and cannot be undone. The following will be cleared:
+      <ul class="confirm-list">
+        <li>All team names &amp; captains (reset to FVL defaults)</li>
+        <li>Pool draw and division assignments</li>
+        <li>Entire match schedule</li>
+        <li>All game scores (Phase 1 &amp; 2)</li>
+        <li>All bracket scores including SuperVolley</li>
+      </ul>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm('confirmReset')">Cancel</button>
+      <button class="btn btn-danger" onclick="doFullReset()">Yes, reset everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESET SCORES CONFIRM -->
+<div class="confirm-overlay" id="confirmScores" onclick="closeConfirm('confirmScores')">
+  <div class="confirm-card" onclick="event.stopPropagation()">
+    <div class="confirm-title warn">↺ Reset Scores</div>
+    <div class="confirm-body">
+      The draw and schedule will be kept. Only scores will be cleared:
+      <ul class="confirm-list">
+        <li>All Phase 1 pool game scores</li>
+        <li>All Phase 2 wildcard game scores</li>
+        <li>All bracket &amp; SuperVolley scores</li>
+      </ul>
+      <b>Teams, draw, and schedule remain intact.</b>
+    </div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm('confirmScores')">Cancel</button>
+      <button class="btn btn-danger" onclick="doResetScores()">Yes, clear all scores</button>
     </div>
   </div>
 </div>
@@ -404,12 +472,58 @@ function searchTeams(q) {
   const lq = q.toLowerCase();
   renderTeamList(teams.filter(t => t.name.toLowerCase().includes(lq) || t.captain.toLowerCase().includes(lq) || t.div.toLowerCase().includes(lq)));
 }
-function resetTeams() {
+// ── RESET ─────────────────────────────────────────────
+function confirmReset() {
+  document.getElementById('confirmReset').classList.add('open');
+}
+function confirmResetScores() {
+  document.getElementById('confirmScores').classList.add('open');
+}
+function closeConfirm(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+async function doFullReset() {
+  closeConfirm('confirmReset');
+  // Reset all local state
   teams = FVL_TEAMS.map(t => ({...t, div: getDiv(t.captain)}));
+  pools = null;
+  schedule = [];
+  schedMode = 'A';
+  gameScores = {};
+  bracketScores = {};
+  activeFilter = 'all';
+  activeTeamFilter = '';
+  // Reset UI
   document.getElementById('teamSearch').value = '';
   initTeamList();
-  debouncedSave();
-  toast('Reset to FVL Spring 2026 teams');
+  // Reset draw section
+  document.getElementById('drawResult').innerHTML = '<div class="empty-state" style="grid-column:span 2"><div class="empty-big">DRAW</div><p>Hit Randomize to assign pools</p></div>';
+  document.getElementById('drawActions').style.display = 'none';
+  // Disable tabs
+  ['tab-1','tab-2','tab-3','tab-4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.disabled = true; el.classList.remove('done','active'); el.classList.add('done'); }
+  });
+  // Reset mode buttons
+  document.getElementById('modeA').classList.add('selected');
+  document.getElementById('modeB').classList.remove('selected');
+  // Go back to step 0
+  goTo(0);
+  // Save cleared state to server
+  await saveStateNow();
+  toast('Full reset complete — back to square one');
+}
+
+async function doResetScores() {
+  closeConfirm('confirmScores');
+  gameScores = {};
+  bracketScores = {};
+  // Re-render current view
+  renderSchedule(activeFilter);
+  renderBracket();
+  await patchScores();
+  toast('All scores cleared — draw and schedule intact');
 }
 
 // ── NAV ───────────────────────────────────────────────
@@ -679,7 +793,13 @@ function renderBracket() {
 function openModal(){document.getElementById('modalOverlay').classList.add('open');document.body.style.overflow='hidden'}
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''}
 function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal()}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeModal();
+    closeConfirm('confirmReset');
+    closeConfirm('confirmScores');
+  }
+});
 
 // ── THEME ─────────────────────────────────────────────
 function toggleTheme(){
