@@ -94,15 +94,13 @@ function buildScheduleFromPools(pools, mode) {
   }
 
   // ── UMPIRE ASSIGNMENT ──────────────────────────────
-  // All 16 captains pool
-  const allCaptains = [
-    ...pools.AVC.Fowler, ...pools.AVC.Central,
-    ...pools.NVC.Dobbs, ...pools.NVC.Extreme
-  ].map(t => t.captain);
+  // Separate captain pools by conference
+  const avcCaptains = [...pools.AVC.Fowler, ...pools.AVC.Central].map(t => t.captain);
+  const nvcCaptains = [...pools.NVC.Dobbs, ...pools.NVC.Extreme].map(t => t.captain);
 
-  // Track how many times each captain has umpired
+  // Track umpire counts per captain
   const umpireCount = {};
-  allCaptains.forEach(c => umpireCount[c] = 0);
+  [...avcCaptains, ...nvcCaptains].forEach(c => umpireCount[c] = 0);
 
   // Group real games by time slot
   const byTime = {};
@@ -111,17 +109,28 @@ function buildScheduleFromPools(pools, mode) {
     byTime[g.time].push(g);
   });
 
-  // For each time slot assign umpires
+  // Assign umpires: AVC game → AVC captain, NVC game → NVC captain
   Object.keys(byTime).sort((a,b) => +a - +b).forEach(t => {
     const games = byTime[t];
-    // Captains playing at this time slot
     const busyCaps = new Set(games.flatMap(g => [g.homeCap, g.awayCap]));
-    // Available: not playing, sorted by least umpired first (shuffle for tiebreaking)
-    const available = shuffle(allCaptains.filter(c => !busyCaps.has(c)))
+
+    // Build available pools per conference (not playing, sorted by fewest duties)
+    const availAVC = shuffle(avcCaptains.filter(c => !busyCaps.has(c)))
+      .sort((a,b) => umpireCount[a] - umpireCount[b]);
+    const availNVC = shuffle(nvcCaptains.filter(c => !busyCaps.has(c)))
       .sort((a,b) => umpireCount[a] - umpireCount[b]);
 
-    games.forEach((g, idx) => {
-      const ump = available[idx] || available[0] || '—';
+    // Track how many from each pool we've used this slot
+    let avcIdx = 0, nvcIdx = 0;
+
+    games.forEach(g => {
+      const isAVC = g.tag.includes('AVC');
+      let ump;
+      if (isAVC) {
+        ump = availAVC[avcIdx++] || availAVC[0] || '—';
+      } else {
+        ump = availNVC[nvcIdx++] || availNVC[0] || '—';
+      }
       g.umpire = ump;
       if (ump !== '—') umpireCount[ump]++;
     });
