@@ -216,6 +216,9 @@ body::after {
 .gcard.home-win { border-color: rgba(0,245,160,.3); }
 .gcard.away-win { border-color: rgba(0,245,160,.3); }
 .gcard.my-team { box-shadow: 0 0 0 2px var(--blue), 0 8px 32px rgba(29,156,240,.25); border-color: var(--blue); }
+.gcard.umpire-duty { border-color: rgba(255,183,0,.4); background: linear-gradient(180deg, rgba(255,183,0,.08) 0%, var(--ink3) 100%); }
+.umpire-banner { background: rgba(255,183,0,.12); border-bottom: 1px solid rgba(255,183,0,.2); padding: 5px 12px; font-size: 11px; font-weight: 700; color: var(--avc); letter-spacing: .04em; text-align: center; }
+@media(prefers-color-scheme:light){ .gcard.umpire-duty { border-color: rgba(180,83,9,.3); background: linear-gradient(180deg,rgba(180,83,9,.05) 0%,#fff 100%); } .umpire-banner { background: rgba(180,83,9,.07); border-color: rgba(180,83,9,.18); color: var(--avc); } }
 
 /* Court indicator — coloured top edge */
 .gcard-court-bar {
@@ -886,7 +889,7 @@ es.onmessage = e => {
   const msg = JSON.parse(e.data);
   if (msg.type === 'state') {
     state = msg.state;
-    renderScreen(activeScreen);
+    if (activeScreen !== 'rules') renderScreen(activeScreen);
   }
 };
 
@@ -896,7 +899,7 @@ function showScreen(id, btn) {
   document.getElementById('screen-' + id).classList.add('active');
   btn.classList.add('active');
   activeScreen = id;
-  renderScreen(id);
+  if (id !== 'rules') renderScreen(id);
 }
 
 function renderScreen(id) {
@@ -904,6 +907,7 @@ function renderScreen(id) {
   if (id === 'standings') renderStandings();
   if (id === 'wildcard') renderWildcard();
   if (id === 'bracket') renderBracket();
+  // 'rules' is static HTML — nothing to render
 }
 
 // ── TEAM FILTER ──
@@ -926,18 +930,24 @@ function buildTeamChips(schedule) {
 
 // ── SCHEDULE ──
 function renderSchedule() {
-  if (!state?.schedule?.length) return;
+  const cards = document.getElementById('cardsSection');
+  const lane = document.getElementById('timeLane');
+  if (!state?.schedule?.length) {
+    if (lane) lane.innerHTML = '';
+    if (cards) cards.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text3)"><div style="font-size:48px;margin-bottom:12px">🏐</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text2)">Draw pending</div><div style="font-size:14px;margin-top:6px">Schedule appears once the director draws the pools</div></div>`;
+    return;
+  }
   const { schedule, gameScores = {} } = state;
   buildTeamChips(schedule);
 
   const sorted = [...schedule].sort((a, b) => a.time - b.time);
 
-  // Derive captain for filtered team
+  // Derive captain for filtered team (null-safe)
   const filteredCapGame = activeTeam ? sorted.find(g => !g.isBreak && (g.home===activeTeam||g.away===activeTeam)) : null;
   const filteredCap = filteredCapGame ? (filteredCapGame.home===activeTeam ? filteredCapGame.homeCap : filteredCapGame.awayCap) : null;
 
   const filtered = activeTeam
-    ? sorted.filter(g => g.isBreak || g.home===activeTeam || g.away===activeTeam || (filteredCap && g.umpire===filteredCap))
+    ? sorted.filter(g => g.isBreak || g.home===activeTeam || g.away===activeTeam || (filteredCap && g.umpire && g.umpire===filteredCap))
     : sorted;
 
   // Group by time slot
@@ -949,6 +959,7 @@ function renderSchedule() {
     timeGroups[t].push(g);
   });
   const times = Object.keys(timeGroups).map(Number).sort((a,b)=>a-b);
+  if (!times.length) { lane.innerHTML = ''; cards.innerHTML = ''; return; }
   if (selectedTime === null || !timeGroups[selectedTime]) selectedTime = times[0];
 
   // Build time lane
@@ -992,13 +1003,15 @@ function renderSchedule() {
     const hW = hasR && hS > aS, aW = hasR && aS > hS;
     const diff = hasR ? Math.abs(hS - aS) : null;
     const isMyTeam = activeTeam && (g.home===activeTeam || g.away===activeTeam);
+    const isUmpire = activeTeam && filteredCap && g.umpire === filteredCap && !isMyTeam;
     const poolClass = g.tag.includes('AVC') ? (g.tag.includes('Wildcard') ? 'pool-wc' : 'pool-avc') : (g.tag.includes('Wildcard') ? 'pool-wc' : 'pool-nvc');
     const poolLabel = g.tag.replace(' · AVC','').replace(' · NVC','');
 
-    cardsHtml += `<div class="gcard court-${g.court}${hasR?' has-result':''}${isMyTeam?' my-team':''}"
+    cardsHtml += `<div class="gcard court-${g.court}${hasR?' has-result':''}${isMyTeam?' my-team':''}${isUmpire?' umpire-duty':''}"
       style="animation-delay:${idx*.06}s"
       onclick="openModal('${g.id}')">
       <div class="gcard-court-bar"></div>
+      ${isUmpire ? `<div class="umpire-banner">🏳 Umpiring · ${g.umpire}</div>` : ''}
       <div class="gcard-body">
         <div class="gcard-meta">
           <span class="gcard-time">C${g.court}</span>
@@ -1015,7 +1028,7 @@ function renderSchedule() {
         </div>
         <div class="gcard-footer">
           <span class="gcard-caps">${g.homeCap} · ${g.awayCap}</span>
-          ${g.umpire ? `<span style="font-size:10px;color:var(--blue);font-weight:600">🏳 ${g.umpire}</span>` : ''}
+          ${g.umpire && !isUmpire ? `<span style="font-size:10px;color:var(--blue);font-weight:600">🏳 ${g.umpire}</span>` : ''}
           ${diff!==null?`<span class="diff-badge">+${diff}</span>`:''}
         </div>
       </div>

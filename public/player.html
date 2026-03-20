@@ -33,6 +33,8 @@
 /* Team filter highlight */
 .game-row.my-team{border-color:var(--avc-dim)!important}
 .game-row.my-team .gr-home,.game-row.my-team .gr-away{font-weight:600}
+.game-row.umpire-game{border-color:#d97706!important;background:linear-gradient(90deg,rgba(217,119,6,.07) 0%,var(--surface) 100%)}
+.umpire-row{background:rgba(217,119,6,.1);border-top:1px solid rgba(217,119,6,.2);padding:4px 10px;font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:#d97706;letter-spacing:.04em}
 select{cursor:pointer}
 
 /* RULES TAB */
@@ -382,7 +384,8 @@ function renderSchedule() {
       const aS = s.away === '' || s.away === undefined ? null : +s.away;
       const hasResult = hS !== null && aS !== null && hS !== aS;
       const isMyTeam = activeTeamFilter && (g.home === activeTeamFilter || g.away === activeTeamFilter);
-      const rowClass = 'game-row' + (hasResult ? hS > aS ? ' home-win' : ' away-win' : '') + (isMyTeam ? ' my-team' : '');
+      const isUmpire = activeTeamFilter && filteredCap && g.umpire === filteredCap && !isMyTeam;
+      const rowClass = 'game-row' + (hasResult ? hS > aS ? ' home-win' : ' away-win' : '') + (isMyTeam ? ' my-team' : '') + (isUmpire ? ' umpire-game' : '');
       const diff = hasResult ? Math.abs(hS - aS) : null;
       const cc = g.court === 1 ? 'c1' : 'c2';
       const hScoreClass = hasResult ? (hS > aS ? 'win-s' : 'lose-s') : 'pending';
@@ -405,6 +408,7 @@ function renderSchedule() {
           <span></span><span></span>
           <span class="gr-tag" style="color:var(--nvc)">🏳 ${g.umpire||'—'}</span>
         </div>
+        ${isUmpire ? `<div class="umpire-row">🏳 Umpiring duty — ${g.umpire}</div>` : ''}
         <div class="game-bottom">
           <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
           <div class="score-inputs" style="display:flex;align-items:center;gap:4px;justify-content:flex-end">

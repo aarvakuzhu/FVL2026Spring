@@ -682,6 +682,8 @@ function renderSchedule(filter) {
     if (!games.filter(g=>!g.isBreak).length) continue;
     html += `<div class="phase-block"><div class="phase-hdr"><span class="phase-badge ${ph.badge}">${ph.bl}</span><span class="phase-title">${ph.label}</span><span class="phase-time">${ph.time}</span></div>`;
     let brkDone = false;
+    // Derive captain for umpire detection
+    const filterCap = (() => { if(!activeTeamFilter) return null; const cap=schedule.filter(g=>!g.isBreak).find(g=>g.home===activeTeamFilter||g.away===activeTeamFilter); return cap?(cap.home===activeTeamFilter?cap.homeCap:cap.awayCap):null; })();
     for (const g of games) {
       if (g.isBreak) { if(!brkDone){html+=`<div class="break-row"><span class="break-icon">⏸ BREAK</span><span class="break-label">10-minute break — both courts</span><span class="break-time">${timeStr(g.time)} – ${timeStr(g.time+10)}</span></div>`;brkDone=true;} continue; }
       const s = gameScores[g.id]||{};
@@ -689,7 +691,10 @@ function renderSchedule(filter) {
       const hasResult = hS!==null&&aS!==null&&hS!==aS;
       const diff = hasResult?Math.abs(hS-aS):null;
       const cc = g.court===1?'c1':'c2';
-      html += `<div class="game-row${hasResult?hS>aS?' home-win':' away-win':''}" id="row-${g.id}">
+      const isPlaying = activeTeamFilter && (g.home===activeTeamFilter||g.away===activeTeamFilter);
+      const isUmpire = activeTeamFilter && filterCap && g.umpire===filterCap && !isPlaying;
+      html += `<div class="game-row${hasResult?hS>aS?' home-win':' away-win':''}${isUmpire?' umpire-game':''}" id="row-${g.id}">
+        ${isUmpire ? `<div class="umpire-row">🏳 Umpiring duty — ${g.umpire}</div>` : ''}
         <div class="game-top">
           <span class="gr-time">${timeStr(g.time)}</span><span class="gr-court ${cc}">C${g.court}</span>
           <span class="gr-home">${g.home}</span><span class="gr-vs">vs</span><span class="gr-away">${g.away}</span>
