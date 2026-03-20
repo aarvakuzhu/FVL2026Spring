@@ -66,14 +66,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'player.html'));
 });
 
-// New player view — v2 design
+// New player view — merged design (stadium bg + system theme + time lanes)
 app.get('/players', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'players.html'));
-});
-
-// New player view — v3 stadium design
-app.get('/players2', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'players2.html'));
 });
 
 // Director view — original
@@ -81,14 +76,9 @@ app.get('/director', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'director.html'));
 });
 
-// New director view — v2 design
+// New director view — merged design (stadium bg + system theme + time lanes + score modal)
 app.get('/td', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'td.html'));
-});
-
-// New director view — v3 stadium design
-app.get('/td2', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'td2.html'));
 });
 
 // Login

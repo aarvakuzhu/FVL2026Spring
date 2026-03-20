@@ -9,25 +9,37 @@
 <style>
 /* ═══════════════════════ TOKENS ═══════════════════════ */
 :root {
-  --ink:#04060f;--ink2:#0b0e1c;--ink3:#141727;--ink4:#1e2236;
-  --rim:rgba(255,255,255,.07);--rim2:rgba(255,255,255,.12);
-  --blue:#1d9cf0;--blue2:#0d6fb8;--blue-g:linear-gradient(135deg,#1d9cf0,#0d6fb8);
-  --win:#00f5a0;--win2:#00b375;
-  --avc:#ffb700;--avc2:#ff8c00;--nvc:#00e5ff;--nvc2:#0099bb;
-  --text:#ffffff;--text2:rgba(255,255,255,.55);--text3:rgba(255,255,255,.28);--text4:rgba(255,255,255,.10);
-  --r:14px;--r2:20px;--r3:28px;--nav:72px;--header:64px;
-  --atmo1:rgba(29,156,240,.15);--atmo2:rgba(0,229,255,.07);
-}
-@media(prefers-color-scheme:light){
-  :root{
-    --ink:#f0f0f5;--ink2:#ffffff;--ink3:#ffffff;--ink4:#e5e5ea;
-    --rim:rgba(0,0,0,.08);--rim2:rgba(0,0,0,.14);
-    --blue:#1a6fd4;--blue2:#0d52a8;--blue-g:linear-gradient(135deg,#1a6fd4,#0d52a8);
-    --win:#16a34a;--win2:#15803d;
-    --avc:#b45309;--avc2:#92400e;--nvc:#0e7490;--nvc2:#155e75;
-    --text:#1c1c1e;--text2:#636366;--text3:#aeaeb2;--text4:rgba(0,0,0,.06);
-    --atmo1:rgba(26,111,212,.08);--atmo2:rgba(14,116,144,.05);
-  }
+  --ink:   #04060f;
+  --ink2:  #0b0e1c;
+  --ink3:  #141727;
+  --ink4:  #1e2236;
+  --glass: rgba(255,255,255,.04);
+  --rim:   rgba(255,255,255,.07);
+  --rim2:  rgba(255,255,255,.12);
+
+  --blue:  #1d9cf0;
+  --blue2: #0d6fb8;
+  --blue-g: linear-gradient(135deg,#1d9cf0,#0d6fb8);
+  --cyan:  #00e5ff;
+  --win:   #00f5a0;
+  --win2:  #00b375;
+  --lose:  #ff3b6b;
+
+  --avc:   #ffb700;
+  --avc2:  #ff8c00;
+  --nvc:   #00e5ff;
+  --nvc2:  #0099bb;
+
+  --t1: #ffffff;
+  --t2: rgba(255,255,255,.55);
+  --t3: rgba(255,255,255,.28);
+  --t4: rgba(255,255,255,.12);
+
+  --r: 14px;
+  --r2: 20px;
+  --r3: 28px;
+  --nav: 72px;
+  --header: 64px;
 }
 
 /* ─── RESET ─── */
@@ -36,7 +48,7 @@ html { height: 100%; overscroll-behavior: none; }
 
 body {
   background: var(--ink);
-  color: var(--text);
+  color: var(--t1);
   font-family: 'Outfit', sans-serif;
   font-size: 15px;
   min-height: 100vh;
@@ -65,7 +77,7 @@ body::after {
 .header {
   position: sticky; top: 0; z-index: 200;
   height: var(--header);
-  background: color-mix(in srgb, var(--ink) 85%, transparent);
+  background: rgba(4,6,15,.85);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   border-bottom: 1px solid var(--rim);
@@ -83,7 +95,7 @@ body::after {
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   line-height: 1;
 }
-.header-event { font-size: 10px; color: var(--text3); letter-spacing: .12em; text-transform: uppercase; margin-top: 1px; }
+.header-event { font-size: 10px; color: var(--t3); letter-spacing: .12em; text-transform: uppercase; margin-top: 1px; }
 .live-badge {
   display: flex; align-items: center; gap: 6px;
   background: rgba(0,245,160,.12);
@@ -109,7 +121,7 @@ body::after {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
   height: calc(var(--nav) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: color-mix(in srgb, var(--ink) 92%, transparent);
+  background: rgba(4,6,15,.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid var(--rim);
@@ -119,7 +131,7 @@ body::after {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 4px; background: none; border: none; cursor: pointer;
-  color: var(--text3); transition: color .2s;
+  color: var(--t3); transition: color .2s;
   position: relative;
 }
 .nav-btn.active { color: var(--blue); }
@@ -165,11 +177,11 @@ body::after {
 .tp-time {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 17px; font-weight: 700; letter-spacing: .03em;
-  color: var(--text2); line-height: 1;
+  color: var(--t2); line-height: 1;
 }
 .time-pill.active .tp-time { color: #fff; }
 .tp-count {
-  font-size: 9px; color: var(--text3); font-weight: 600;
+  font-size: 9px; color: var(--t3); font-weight: 600;
   letter-spacing: .06em; text-transform: uppercase; margin-top: 2px;
 }
 .time-pill.active .tp-count { color: rgba(255,255,255,.7); }
@@ -193,7 +205,7 @@ body::after {
 .cth-time {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 28px; font-weight: 800; letter-spacing: .04em;
-  color: var(--text); line-height: 1;
+  color: var(--t1); line-height: 1;
 }
 .cth-line { flex: 1; height: 1px; background: var(--rim); }
 .cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -233,7 +245,7 @@ body::after {
 }
 .gcard-time {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px; font-weight: 600; color: var(--text3);
+  font-size: 13px; font-weight: 600; color: var(--t3);
   letter-spacing: .06em;
 }
 .gcard-pool {
@@ -251,18 +263,18 @@ body::after {
 .gcard-team-name {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 16px; font-weight: 700; letter-spacing: .03em;
-  color: var(--text2); line-height: 1.1;
+  color: var(--t2); line-height: 1.1;
   flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.gcard-team.winner .gcard-team-name { color: var(--text); }
-.gcard-team.loser  .gcard-team-name { color: var(--text4); }
+.gcard-team.winner .gcard-team-name { color: var(--t1); }
+.gcard-team.loser  .gcard-team-name { color: var(--t4); }
 .gcard-score {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 26px; font-weight: 900; letter-spacing: -.02em;
-  color: var(--text3); min-width: 34px; text-align: right; line-height: 1;
+  color: var(--t3); min-width: 34px; text-align: right; line-height: 1;
 }
 .gcard-team.winner .gcard-score { color: var(--win); text-shadow: 0 0 16px rgba(0,245,160,.4); }
-.gcard-team.loser  .gcard-score { color: var(--text4); }
+.gcard-team.loser  .gcard-score { color: var(--t4); }
 .gcard-score.pending { font-size: 18px; }
 
 .gcard-divider { height: 1px; background: var(--rim); margin: 4px 0; }
@@ -272,14 +284,14 @@ body::after {
 }
 .vs-dot {
   width: 5px; height: 5px; border-radius: 50%;
-  background: var(--text4);
+  background: var(--t4);
 }
 .gcard-footer {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 8px; padding-top: 8px;
   border-top: 1px solid var(--rim);
 }
-.gcard-caps { font-size: 10px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gcard-caps { font-size: 10px; color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .diff-badge {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 13px; font-weight: 700;
@@ -290,7 +302,7 @@ body::after {
 /* ─── SCORE MODAL ─── */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: color-mix(in srgb, var(--ink) 70%, transparent);
+  background: rgba(4,6,15,.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   opacity: 0; pointer-events: none;
@@ -338,8 +350,8 @@ body::after {
 }
 .modal-court-badge.c1 { background: rgba(255,183,0,.15); color: var(--avc); border: 1px solid rgba(255,183,0,.25); }
 .modal-court-badge.c2 { background: rgba(0,229,255,.12); color: var(--nvc); border: 1px solid rgba(0,229,255,.2); }
-.modal-phase { font-size: 10px; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
-.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; color: var(--text2); letter-spacing: .04em; }
+.modal-phase { font-size: 10px; color: var(--t3); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; color: var(--t2); letter-spacing: .04em; }
 
 /* Scoreboard */
 .scoreboard {
@@ -378,12 +390,12 @@ body::after {
 .sb-team-name {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 22px; font-weight: 800; letter-spacing: .02em;
-  color: var(--text2); line-height: 1;
+  color: var(--t2); line-height: 1;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.sb-team-row.winner .sb-team-name { color: var(--text); }
-.sb-team-row.loser  .sb-team-name { color: var(--text4); }
-.sb-cap { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.sb-team-row.winner .sb-team-name { color: var(--t1); }
+.sb-team-row.loser  .sb-team-name { color: var(--t4); }
+.sb-cap { font-size: 11px; color: var(--t3); margin-top: 2px; }
 .sb-win-badge {
   font-size: 10px; font-weight: 700; letter-spacing: .06em;
   text-transform: uppercase; color: var(--win);
@@ -395,15 +407,15 @@ body::after {
 .sb-score-display {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 52px; font-weight: 900; letter-spacing: -.02em;
-  color: var(--text3); line-height: 1; font-variant-numeric: tabular-nums;
+  color: var(--t3); line-height: 1; font-variant-numeric: tabular-nums;
   transition: color .2s;
 }
 .sb-team-row.winner .sb-score-display {
   color: var(--win);
   text-shadow: 0 0 30px rgba(0,245,160,.35);
 }
-.sb-team-row.loser .sb-score-display { color: var(--text4); }
-.sb-score-display.pending { font-size: 36px; color: var(--text4); }
+.sb-team-row.loser .sb-score-display { color: var(--t4); }
+.sb-score-display.pending { font-size: 36px; color: var(--t4); }
 
 /* Score diff strip */
 .score-diff-strip {
@@ -412,7 +424,7 @@ body::after {
   border-top: 1px solid var(--rim);
   background: var(--ink);
 }
-.diff-strip-label { font-size: 11px; color: var(--text3); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.diff-strip-label { font-size: 11px; color: var(--t3); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 .diff-strip-val {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 18px; font-weight: 800;
@@ -423,11 +435,11 @@ body::after {
   position: absolute; top: 14px; right: 18px;
   width: 34px; height: 34px; border-radius: 50%;
   background: var(--ink4); border: 1px solid var(--rim);
-  color: var(--text2); font-size: 16px;
+  color: var(--t2); font-size: 16px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all .2s;
 }
-.modal-close-btn:hover { background: var(--rim); color: var(--text); }
+.modal-close-btn:hover { background: var(--rim); color: var(--t1); }
 
 /* ─── TEAM FILTER ─── */
 .filter-row {
@@ -442,7 +454,7 @@ body::after {
   display: flex; align-items: center; gap: 5px;
   background: var(--ink3); border: 1px solid var(--rim);
   border-radius: 20px; padding: 6px 12px; cursor: pointer;
-  font-size: 12px; font-weight: 600; color: var(--text2);
+  font-size: 12px; font-weight: 600; color: var(--t2);
   transition: all .15s; white-space: nowrap;
 }
 .team-chip.active {
@@ -458,7 +470,7 @@ body::after {
 .conf-section { margin-bottom: 24px; }
 .conf-label {
   font-size: 10px; font-weight: 700; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--text3);
+  text-transform: uppercase; color: var(--t3);
   padding: 0 4px; margin-bottom: 10px;
   display: flex; align-items: center; gap: 8px;
 }
@@ -476,7 +488,7 @@ body::after {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 15px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
 }
-.pp-conf { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; }
+.pp-conf { font-size: 10px; font-weight: 600; color: var(--t3); letter-spacing: .06em; text-transform: uppercase; }
 .st-row {
   display: flex; align-items: center; gap: 8px;
   padding: 9px 12px; border-bottom: 1px solid var(--rim);
@@ -486,25 +498,25 @@ body::after {
 .st-row.p1 { background: rgba(29,156,240,.08); }
 .st-num {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px; font-weight: 800; color: var(--text4);
+  font-size: 18px; font-weight: 800; color: var(--t4);
   width: 18px; text-align: center; flex-shrink: 0;
 }
 .st-row.p1 .st-num { color: var(--blue); }
 .st-info { flex: 1; min-width: 0; }
 .st-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px; font-weight: 700; color: var(--text2);
+  font-size: 14px; font-weight: 700; color: var(--t2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;
 }
-.st-row.p1 .st-name { color: var(--text); }
-.st-cap { font-size: 10px; color: var(--text3); }
+.st-row.p1 .st-name { color: var(--t1); }
+.st-cap { font-size: 10px; color: var(--t3); }
 .st-wl {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 15px; font-weight: 700; color: var(--text2); text-align: right;
+  font-size: 15px; font-weight: 700; color: var(--t2); text-align: right;
   line-height: 1; flex-shrink: 0;
 }
 .st-row.p1 .st-wl { color: var(--blue); }
-.st-diff { font-size: 10px; color: var(--text3); text-align: right; flex-shrink: 0; min-width: 28px; }
+.st-diff { font-size: 10px; color: var(--t3); text-align: right; flex-shrink: 0; min-width: 28px; }
 .qual-pip {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--blue); flex-shrink: 0;
@@ -528,7 +540,7 @@ body::after {
   font-size: 10px; font-weight: 700; color: var(--win);
   letter-spacing: .1em; text-transform: uppercase; flex-shrink: 0;
 }
-.wc-banner-teams { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text2); }
+.wc-banner-teams { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--t2); }
 .wc-race-hdr {
   font-size: 10px; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
@@ -548,32 +560,32 @@ body::after {
 }
 .wc-pos-num {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px; font-weight: 900; color: var(--text4);
+  font-size: 22px; font-weight: 900; color: var(--t4);
 }
 .wc-row.in .wc-pos-num { color: var(--blue); }
 .wc-body { flex: 1; padding: 12px 14px; min-width: 0; }
 .wc-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 17px; font-weight: 700; color: var(--text2); line-height: 1;
+  font-size: 17px; font-weight: 700; color: var(--t2); line-height: 1;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.wc-row.in .wc-name { color: var(--text); }
-.wc-cap { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.wc-row.in .wc-name { color: var(--t1); }
+.wc-cap { font-size: 11px; color: var(--t3); margin-top: 1px; }
 .wc-status {
   font-size: 9px; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; margin-top: 5px;
   padding: 2px 6px; border-radius: 4px; display: inline-block;
 }
 .wc-status.in { background: rgba(29,156,240,.15); color: var(--blue); }
-.wc-status.out { background: var(--rim); color: var(--text3); }
+.wc-status.out { background: var(--rim); color: var(--t3); }
 .wc-status.qual { background: rgba(0,245,160,.1); color: var(--win); }
 .wc-stats-block { padding: 12px 14px; text-align: right; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 2px; }
 .wc-wl {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px; font-weight: 800; color: var(--text2); letter-spacing: -.02em;
+  font-size: 18px; font-weight: 800; color: var(--t2); letter-spacing: -.02em;
 }
 .wc-row.in .wc-wl { color: var(--blue); }
-.wc-diff { font-size: 11px; color: var(--text3); }
+.wc-diff { font-size: 11px; color: var(--t3); }
 .cutline { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
 .cutline-line { flex: 1; height: 1px; border-top: 1px dashed rgba(255,59,107,.4); }
 .cutline-label { font-size: 10px; font-weight: 700; color: rgba(255,59,107,.6); letter-spacing: .08em; text-transform: uppercase; }
@@ -587,10 +599,10 @@ body::after {
   font-size: 22px; font-weight: 900; letter-spacing: .04em;
   text-transform: uppercase; line-height: 1;
 }
-.b-conf-sub { font-size: 11px; color: var(--text3); font-weight: 500; margin-top: 1px; }
+.b-conf-sub { font-size: 11px; color: var(--t3); font-weight: 500; margin-top: 1px; }
 .b-round-label {
   font-size: 10px; font-weight: 700; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--text3); margin: 14px 0 6px;
+  text-transform: uppercase; color: var(--t3); margin: 14px 0 6px;
 }
 .b-card {
   background: var(--ink3); border: 1px solid var(--rim);
@@ -609,31 +621,31 @@ body::after {
 }
 .b-seed {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px; font-weight: 700; color: var(--text4);
+  font-size: 13px; font-weight: 700; color: var(--t4);
   width: 18px; text-align: center; flex-shrink: 0;
 }
 .b-team-row.winner .b-seed { color: var(--win); }
 .b-info { flex: 1; min-width: 0; }
 .b-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 17px; font-weight: 700; color: var(--text2);
+  font-size: 17px; font-weight: 700; color: var(--t2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;
 }
-.b-team-row.winner .b-name { color: var(--text); }
-.b-team-row.loser  .b-name { color: var(--text4); }
-.b-cap { font-size: 10px; color: var(--text3); }
+.b-team-row.winner .b-name { color: var(--t1); }
+.b-team-row.loser  .b-name { color: var(--t4); }
+.b-cap { font-size: 10px; color: var(--t3); }
 .b-badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 4px; vertical-align: middle; }
 .b-badge.auto { background: rgba(255,183,0,.15); color: var(--avc); }
 .b-badge.wild { background: rgba(29,156,240,.15); color: var(--blue); }
 .b-score {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px; font-weight: 900; color: var(--text4);
+  font-size: 28px; font-weight: 900; color: var(--t4);
   min-width: 36px; text-align: right; font-variant-numeric: tabular-nums; line-height: 1;
 }
 .b-team-row.winner .b-score { color: var(--win); text-shadow: 0 0 20px rgba(0,245,160,.3); }
-.b-team-row.loser  .b-score { color: var(--text4); }
+.b-team-row.loser  .b-score { color: var(--t4); }
 .b-foot { padding: 8px 16px; background: var(--ink); display: flex; justify-content: space-between; }
-.b-meta { font-size: 11px; color: var(--text3); }
+.b-meta { font-size: 11px; color: var(--t3); }
 
 /* SuperVolley card */
 .sv-card {
@@ -661,12 +673,12 @@ body::after {
 .sv-conf-tag { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; width: 34px; text-align: center; }
 .sv-conf-tag.avc { color: var(--avc); }
 .sv-conf-tag.nvc { color: var(--nvc); }
-.sv-name { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; flex: 1; color: var(--text2); letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sv-name.winner { color: var(--text); }
-.sv-score { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; color: var(--text3); font-variant-numeric: tabular-nums; line-height: 1; }
+.sv-name { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; flex: 1; color: var(--t2); letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sv-name.winner { color: var(--t1); }
+.sv-score { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; color: var(--t3); font-variant-numeric: tabular-nums; line-height: 1; }
 .sv-score.winner { color: var(--win); text-shadow: 0 0 24px rgba(0,245,160,.4); }
-.sv-score.loser { color: var(--text4); }
-.sv-vs { text-align: center; font-size: 12px; font-weight: 700; color: var(--text4); padding: 2px 0; }
+.sv-score.loser { color: var(--t4); }
+.sv-vs { text-align: center; font-size: 12px; font-weight: 700; color: var(--t4); padding: 2px 0; }
 
 /* ─── RULES ─── */
 .rules-wrap { padding: 16px 14px; }
@@ -680,8 +692,8 @@ body::after {
 .rules-panel { background: var(--ink3); border: 1px solid var(--rim); border-radius: var(--r2); overflow: hidden; }
 .rules-row { display: flex; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--rim); gap: 12px; }
 .rules-row:last-child { border-bottom: none; }
-.rules-key { font-size: 13px; color: var(--text2); flex: 1; }
-.rules-val { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); text-align: right; }
+.rules-key { font-size: 13px; color: var(--t2); flex: 1; }
+.rules-val { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--t1); text-align: right; }
 .phase-row { padding: 14px 16px; border-bottom: 1px solid var(--rim); }
 .phase-row:last-child { border-bottom: none; }
 .phase-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
@@ -694,18 +706,18 @@ body::after {
 .phase-circle.star { background: linear-gradient(135deg,var(--avc),var(--avc2)); box-shadow: 0 4px 12px rgba(255,183,0,.3); }
 .phase-pname { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: .02em; flex: 1; }
 .phase-time-badge {
-  font-size: 11px; font-weight: 600; color: var(--text3);
+  font-size: 11px; font-weight: 600; color: var(--t3);
   background: var(--ink); border: 1px solid var(--rim);
   border-radius: 8px; padding: 2px 8px;
 }
-.phase-desc { font-size: 12px; color: var(--text3); line-height: 1.6; padding-left: 42px; }
+.phase-desc { font-size: 12px; color: var(--t3); line-height: 1.6; padding-left: 42px; }
 .games-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
 .games-box {
   background: var(--ink3); border: 1px solid var(--rim);
   border-radius: var(--r); padding: 14px 8px; text-align: center;
 }
 .games-num { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; line-height: 1; }
-.games-lbl { font-size: 10px; color: var(--text3); margin-top: 4px; line-height: 1.3; }
+.games-lbl { font-size: 10px; color: var(--t3); margin-top: 4px; line-height: 1.3; }
 </style>
 </head>
 <body>
@@ -751,9 +763,9 @@ body::after {
 <!-- STANDINGS -->
 <div class="screen" id="screen-standings">
   <div class="standings-wrap" id="standingsContent">
-    <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+    <div style="text-align:center;padding:60px 20px;color:var(--t3)">
       <div style="font-size:48px;margin-bottom:12px">📊</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text2)">No scores yet</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--t2)">No scores yet</div>
     </div>
   </div>
 </div>
@@ -761,9 +773,9 @@ body::after {
 <!-- WILDCARD -->
 <div class="screen" id="screen-wildcard">
   <div class="wc-wrap" id="wildcardContent">
-    <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+    <div style="text-align:center;padding:60px 20px;color:var(--t3)">
       <div style="font-size:48px;margin-bottom:12px">🎟</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text2)">Race not started</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--t2)">Race not started</div>
     </div>
   </div>
 </div>
@@ -771,9 +783,9 @@ body::after {
 <!-- BRACKET -->
 <div class="screen" id="screen-bracket">
   <div class="bracket-wrap" id="bracketContent">
-    <div style="text-align:center;padding:60px 20px;color:var(--text3)">
+    <div style="text-align:center;padding:60px 20px;color:var(--t3)">
       <div style="font-size:48px;margin-bottom:12px">🏆</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text2)">Bracket pending</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--t2)">Bracket pending</div>
     </div>
   </div>
 </div>
@@ -805,7 +817,7 @@ body::after {
     <div class="rules-block">
       <div class="rules-block-title">Games Per Team</div>
       <div class="games-row">
-        <div class="games-box"><div class="games-num" style="color:var(--text4)">4</div><div class="games-lbl">Didn't qualify</div></div>
+        <div class="games-box"><div class="games-num" style="color:var(--t4)">4</div><div class="games-lbl">Didn't qualify</div></div>
         <div class="games-box"><div class="games-num" style="color:var(--nvc)">5</div><div class="games-lbl">SF exit</div></div>
         <div class="games-box"><div class="games-num" style="color:var(--avc)">6</div><div class="games-lbl">Div final exit</div></div>
         <div class="games-box"><div class="games-num" style="color:var(--blue)">7</div><div class="games-lbl">Finalist</div></div>
@@ -977,7 +989,7 @@ function renderSchedule() {
   if (!selectedTime || !timeGroups[selectedTime]) { cards.innerHTML = ''; return; }
 
   const curGames = timeGroups[selectedTime];
-  let cardsHtml = `<div class="cards-time-header"><div class="cth-time">${timeStr(selectedTime)}</div><div class="cth-line"></div><div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">${curGames.length} game${curGames.length>1?'s':''}</div></div>`;
+  let cardsHtml = `<div class="cards-time-header"><div class="cth-time">${timeStr(selectedTime)}</div><div class="cth-line"></div><div style="font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase">${curGames.length} game${curGames.length>1?'s':''}</div></div>`;
   cardsHtml += '<div class="cards-row">';
 
   curGames.forEach((g, idx) => {
