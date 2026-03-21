@@ -728,7 +728,10 @@ body::after {
     <div class="header-name">SuperVolley</div>
     <div class="header-event">FVL Spring 2026</div>
   </div>
-  <div class="live-badge"><div class="live-dot"></div>Live</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button onclick="exportScheduleCSV()" style="background:var(--ink3);border:1px solid var(--rim2);border-radius:10px;padding:6px 11px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:.02em">⬇ CSV</button>
+    <div class="live-badge"><div class="live-dot"></div>Live</div>
+  </div>
 </header>
 
 <!-- SCHEDULE -->
@@ -972,7 +975,7 @@ function buildTeamChips(schedule) {
   schedule.filter(g => !g.isBreak).forEach(g => { teamMap[g.home] = g.homeCap; teamMap[g.away] = g.awayCap; });
   const names = Object.keys(teamMap).sort();
   chips.innerHTML = `<div class="team-chip${!activeTeam?' active':''}" onclick="filterTeam('',this)"><span>All games</span></div>` +
-    names.map(n => `<div class="team-chip${n===activeTeam?' active':''}" onclick="filterTeam('${n.replace(/'/g,"\\'")}',this)"><div class="chip-dot"></div><span>${teamMap[n]}</span></div>`).join('');
+    names.map(n => `<div class="team-chip${n===activeTeam?' active':''}" onclick="filterTeam('${n.replace(/'/g,"\\'")}',this)">${captainAvatar(teamMap[n],22)}<span>${teamMap[n]}</span></div>`).join('');
 }
 
 // ── SCHEDULE ──
@@ -1113,8 +1116,7 @@ function openModal(gameId) {
   document.getElementById('scoreboardContent').innerHTML = `
     <div class="sb-team-row${hW?' winner':hasR?' loser':''}">
       <div class="sb-team-info">
-        <div class="sb-team-name">${g.home}</div>
-        <div class="sb-cap">${g.homeCap}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">${captainAvatar(g.homeCap,40)}<div><div class="sb-team-name">${g.home}</div><div class="sb-cap">${g.homeCap}</div></div></div>
         ${hW?'<div class="sb-win-badge">Winner</div>':''}
       </div>
       <div class="sb-score-block">
@@ -1123,8 +1125,7 @@ function openModal(gameId) {
     </div>
     <div class="sb-team-row${aW?' winner':hasR?' loser':''}">
       <div class="sb-team-info">
-        <div class="sb-team-name">${g.away}</div>
-        <div class="sb-cap">${g.awayCap}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">${captainAvatar(g.awayCap,40)}<div><div class="sb-team-name">${g.away}</div><div class="sb-cap">${g.awayCap}</div></div></div>
         ${aW?'<div class="sb-win-badge">Winner</div>':''}
       </div>
       <div class="sb-score-block">
@@ -1162,6 +1163,7 @@ function renderStandings() {
           const diff = t.pf - t.pa;
           return `<div class="st-row${i===0?' p1':''}">
             ${i===0?'<div class="qual-pip"></div>':'<div class="st-num">'+(i+1)+'</div>'}
+            ${captainAvatar(t.cap, 28)}
             <div class="st-info"><div class="st-name">${t.name}</div><div class="st-cap">${t.cap}</div></div>
             <div><div class="st-wl">${t.w}–${t.l}</div><div class="st-diff">${diff>=0?'+':''}${diff}</div></div>
           </div>`;
@@ -1256,6 +1258,26 @@ function renderBracket() {
 }
 
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+function exportScheduleCSV() {
+  if (!state?.schedule?.length) { alert('No schedule yet'); return; }
+  const esc = v => { const s=String(v==null?'':v); return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s; };
+  const rows = [['Phase','Time','Court','Pool / Division','Home Team','Home Captain','Away Team','Away Captain','Umpire','Home Score','Away Score','Point Differential','Result']];
+  const { schedule, gameScores={} } = state;
+  [...schedule].filter(g=>!g.isBreak).sort((a,b)=>a.time-b.time||a.court-b.court).forEach(g=>{
+    const s=gameScores[g.id]||{};
+    const hS=s.home===''||s.home==null?'':+s.home, aS=s.away===''||s.away==null?'':+s.away;
+    const diff=hS!==''&&aS!==''&&hS!==aS?Math.abs(hS-aS):'';
+    const result=hS!==''&&aS!==''&&hS!==aS?(hS>aS?g.home+' win':g.away+' win'):hS!==''&&aS!==''?'Draw':'Pending';
+    const phase=g.phase==='p1'?'Phase 1 – Pool Play':'Phase 2 – Wildcard';
+    rows.push([phase,timeStr(g.time),'Court '+g.court,g.tag,g.home,g.homeCap,g.away,g.awayCap,g.umpire||'—',hS,aS,diff!==''?(hS>aS?'+':'-')+diff:'',result]);
+  });
+  const csv=rows.map(r=>r.map(esc).join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`FVL_Spring2026_Schedule_${new Date().toISOString().slice(0,16).replace('T','_').replace(':','h')}.csv`;
+  a.click();
+}
 </script>
 </body>
 </html>

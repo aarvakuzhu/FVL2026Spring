@@ -99,7 +99,10 @@ body.light .rules-phase-time{background:var(--surface2)}
       <div class="logo-title">SuperVolley</div>
       <div class="logo-sub">Live Tournament View · 8:30am – 5:30pm</div>
     </div>
-    <div class="hero-meta">16 teams · 2 courts<br>AVC &amp; NVC</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="hero-meta">16 teams · 2 courts<br>AVC &amp; NVC</div>
+      <button onclick="exportScheduleCSV()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:5px 10px;font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:var(--text2);cursor:pointer;letter-spacing:.04em">⬇ CSV</button>
+    </div>
   </div>
   <div class="div-pills">
     <div class="div-pill avc">AVC — Fowler &amp; Central</div>
@@ -547,6 +550,25 @@ function renderBracket() {
   </div>`;
 
   el.innerHTML = html;
+}
+
+function exportScheduleCSV() {
+  if (!schedule.length) { alert('No schedule yet'); return; }
+  const esc = v => { const s=String(v==null?'':v); return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s; };
+  const rows = [['Phase','Time','Court','Pool / Division','Home Team','Home Captain','Away Team','Away Captain','Umpire','Home Score','Away Score','Point Differential','Result']];
+  [...schedule].filter(g=>!g.isBreak).sort((a,b)=>a.time-b.time||a.court-b.court).forEach(g=>{
+    const s=gameScores[g.id]||{};
+    const hS=s.home===''||s.home==null?'':+s.home, aS=s.away===''||s.away==null?'':+s.away;
+    const diff=hS!==''&&aS!==''&&hS!==aS?Math.abs(hS-aS):'';
+    const result=hS!==''&&aS!==''&&hS!==aS?(hS>aS?g.home+' win':g.away+' win'):hS!==''&&aS!==''?'Draw':'Pending';
+    const phase=g.phase==='p1'?'Phase 1 – Pool Play':'Phase 2 – Wildcard';
+    rows.push([phase,timeStr(g.time),'Court '+g.court,g.tag,g.home,g.homeCap,g.away,g.awayCap,g.umpire||'—',hS,aS,diff!==''?(hS>aS?'+':'-')+diff:'',result]);
+  });
+  const csv=rows.map(r=>r.map(esc).join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`FVL_Spring2026_Schedule_${new Date().toISOString().slice(0,16).replace('T','_').replace(':','h')}.csv`;
+  a.click();
 }
 </script>
 </body>

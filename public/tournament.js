@@ -3,7 +3,33 @@
 // FVL Spring 2026
 // ═══════════════════════════════════════════════════════
 
-const NVC_CAPTAINS = [
+const CAPTAIN_PHOTOS = {
+  'Divyanshu Ranjan':   'https://drive.google.com/uc?export=view&id=1sgMR2FMWf5IvO1rXjkvAtS1cxAugPch7',
+  'Anil Reddy Gurrala': 'https://drive.google.com/uc?export=view&id=1LXwgRP3DQmxbWw1DX1sHRC07Vhv1vSRF',
+  'Bharath Muttavarapu':'https://drive.google.com/uc?export=view&id=1fIZBnmkSRs-0tWD1moeLyMUwAENQz8B_',
+  'Pratap':             'https://drive.google.com/uc?export=view&id=1pJgPvJmD7U7zedNwHXODW9hRhKwqUFwb',
+  'Santosh Nareddy':    'https://drive.google.com/uc?export=view&id=1IOQOx0I5u7BkHXvSaCq18D_veTY2WvK4',
+  'Sonu (Kapil)':       'https://drive.google.com/uc?export=view&id=1B4YRTqu2dDCsthHTJqmscy2n4Clzt2vV',
+  'Ishant Mehndiratta': 'https://drive.google.com/uc?export=view&id=1sDEmid2ZVfTufncdVuiF5Vem3odx-54M',
+  'Uday Battineni':     'https://drive.google.com/uc?export=view&id=1DoVcp-Q1g1LNbNJEqY96uVnzggLhRYbq',
+  'Ritesh Gupta':       'https://drive.google.com/uc?export=view&id=19-IotE0V-ru58IIqqis7BqCpW312Rxvy',
+  'Ronak Bathani':      'https://drive.google.com/uc?export=view&id=1H4soPf2ztA_uVzYgq9YLIG9EXMHjmW6k',
+  'Naveen kumar':       'https://drive.google.com/uc?export=view&id=1QrNWkDz4RfImHnB_A6puWcnvyJxEQqct',
+  'Rakesh kumar':       'https://drive.google.com/uc?export=view&id=1T7efu_V3Ao0CxvXf54MeXh9HGaQmuLaJ',
+  'Surendra Kanna':     'https://drive.google.com/uc?export=view&id=1GqCWTaDJnv9BnbMfBl2hKqFA14XiGetP',
+  'Keyur Patel':        'https://drive.google.com/uc?export=view&id=1p5Aek2w9hkMuWpsoHXSB_1yxBnlLah5H',
+  'Govardhana Peruri':  'https://drive.google.com/uc?export=view&id=1PuFr8F_lfIhSAkuo8QOYs85VU4aCwMX4',
+  'Murali Atkuri':      'https://drive.google.com/uc?export=view&id=1Jlz7y__iJwAqw2XDzGYKTGOL7zhch-P0',
+};
+
+// Returns an avatar img element string for a captain name
+function captainAvatar(name, size=32) {
+  const url = CAPTAIN_PHOTOS[name];
+  if (!url) return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rim2,rgba(255,255,255,.1));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.4)}px;font-weight:700;color:var(--text3,#aaa)">${name.charAt(0)}</div>`;
+  return `<img src="${url}" alt="${name}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--rim2)" onerror="this.style.display='none'">`;
+}
+
+
   'Ritesh Gupta','Keyur Patel','Pratap','Bharath Muttavarapu',
   'Surendra Kanna','Sonu (Kapil)','Govardhana Peruri','Murali Atkuri'
 ];
