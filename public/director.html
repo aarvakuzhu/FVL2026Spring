@@ -528,7 +528,11 @@ function renderTeamList(list) {
   document.getElementById('teamList').innerHTML = list.map(t => {
     const i = teams.indexOf(t), dc = t.div==='AVC'?'avc':'nvc';
     return `<div class="team-row ${dc}-team">
-      <div class="team-num">T${String(i+1).padStart(2,'0')}<br><span class="div-tag ${dc}">${t.div}</span></div>
+      <div class="team-num" style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        ${captainAvatar(t.captain, 36)}
+        <span style="font-size:9px;color:var(--muted)">T${String(i+1).padStart(2,'0')}</span>
+        <span class="div-tag ${dc}">${t.div}</span>
+      </div>
       <div class="field-col"><div class="field-hint">Team</div><input type="text" value="${t.name}" oninput="teams[${i}].name=this.value;debouncedSave()"/></div>
       <div class="field-col"><div class="field-hint">Captain</div><input type="text" value="${t.captain}" oninput="teams[${i}].captain=this.value;debouncedSave()"/></div>
     </div>`;
@@ -767,7 +771,8 @@ function onScoreChange(gameId, side, val) {
 function onBracketScoreChange(bid, side, val) {
   if (!bracketScores[bid]) bracketScores[bid] = {home:'',away:''};
   bracketScores[bid][side] = val===''?'':parseInt(val)||0;
-  updateBracketRow(bid);
+  // Re-render full bracket so SF winners carry into final and division winners into SV
+  renderBracket();
   patchScores();
 }
 function updateBracketRow(bid) {
@@ -837,6 +842,18 @@ function renderBracket() {
       </div></div>`;
     };
 
+    // Resolve SF winners to carry into division final
+    const sfWinner = (sfBid, seedHome, seedAway) => {
+      const s = bracketScores[sfBid]||{};
+      const h = s.home===''||s.home==null?null:+s.home;
+      const a = s.away===''||s.away==null?null:+s.away;
+      if (h===null||a===null||h===a) return null;
+      return h > a ? seedHome : seedAway;
+    };
+
+    const sf1Winner = sfWinner(div+'-sf1', seeds[0], seeds[3]);
+    const sf2Winner = sfWinner(div+'-sf2', seeds[1], seeds[2]);
+
     html += `<div class="bracket-section">
       <div class="bracket-conf-header ${conf}"><span class="bracket-conf-name">${div} — ${div==='AVC'?'American Volleyball Conference':'National Volleyball Conference'}</span><span class="bracket-conf-sub">Seeded 1–4 by combined record</span></div>
       <div style="height:8px"></div>
@@ -845,11 +862,26 @@ function renderBracket() {
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">Semifinal 2 · Seed 2 vs Seed 3</div>
       ${gameCard(div+'-sf2',seeds[1],seeds[2],div+' Semifinal 2',t3+25)}
       <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">${div} Championship Final</div>
-      ${gameCard(div+'-final',null,null,div+' Championship Final',t3+50)}
+      ${gameCard(div+'-final',sf1Winner,sf2Winner,div+' Championship Final',t3+50)}
     </div>`;
   });
 
-  // SuperVolley
+  // Resolve division final winners for SuperVolley
+  const divFinalWinner = (div) => {
+    const seeds = getBracketSeeds(div, pools, schedule, gameScores);
+    const sf1W = (() => { const s=bracketScores[div+'-sf1']||{}; const h=s.home===''||s.home==null?null:+s.home,a=s.away===''||s.away==null?null:+s.away; if(h===null||a===null||h===a)return null; return h>a?seeds[0]:seeds[3]; })();
+    const sf2W = (() => { const s=bracketScores[div+'-sf2']||{}; const h=s.home===''||s.home==null?null:+s.home,a=s.away===''||s.away==null?null:+s.away; if(h===null||a===null||h===a)return null; return h>a?seeds[1]:seeds[2]; })();
+    const fs = bracketScores[div+'-final']||{};
+    const fh=fs.home===''||fs.home==null?null:+fs.home, fa=fs.away===''||fs.away==null?null:+fs.away;
+    if (fh===null||fa===null||fh===fa) return null;
+    return fh > fa ? sf1W : sf2W;
+  };
+
+  const avcChamp = divFinalWinner('AVC');
+  const nvcChamp = divFinalWinner('NVC');
+  const avcName = avcChamp ? avcChamp.name : 'AVC Champion';
+  const nvcName = nvcChamp ? nvcChamp.name : 'NVC Champion';
+
   const sv = bracketScores['supervolley']||{};
   const shS=sv.home===''||!sv.home?null:+sv.home, saS=sv.away===''||!sv.away?null:+sv.away;
   const svHasR=shS!==null&&saS!==null&&shS!==saS, svDiff=svHasR?Math.abs(shS-saS):null;
@@ -857,10 +889,10 @@ function renderBracket() {
     <div class="sv-top"><div><div class="sv-eyebrow">FVL Spring 2026 · Champion of Champions</div><div class="sv-trophy">★ SuperVolley Final ★</div></div>
     <div class="sv-right"><div class="sv-time">${timeStr(495)}</div><div class="sv-court">Centre court</div></div></div>
     <div class="sv-teams">
-      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag avc">AVC Champion</div><div class="sv-team-name${svHasR&&shS>saS?' winner':''}">AVC Champion</div></div>
+      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag avc">AVC</div><div class="sv-team-name${svHasR&&shS>saS?' winner':''}">${avcName}</div>${avcChamp?`<div style="font-size:11px;color:var(--muted)">${avcChamp.captain}</div>`:''}</div>
       <div class="sv-score-area"><div class="sv-score-num${svHasR?shS>saS?' winner':' loser':''}">${shS!==null?shS:'–'}</div></div></div>
       <div class="sv-div">vs</div>
-      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag nvc">NVC Champion</div><div class="sv-team-name${svHasR&&saS>shS?' winner':''}">NVC Champion</div></div>
+      <div class="sv-team-row"><div class="sv-team-info"><div class="sv-conf-tag nvc">NVC</div><div class="sv-team-name${svHasR&&saS>shS?' winner':''}">${nvcName}</div>${nvcChamp?`<div style="font-size:11px;color:var(--muted)">${nvcChamp.captain}</div>`:''}</div>
       <div class="sv-score-area"><div class="sv-score-num${svHasR?saS>shS?' winner':' loser':''}">${saS!==null?saS:'–'}</div></div></div>
     </div>
     <div class="sv-bottom">
@@ -1098,36 +1130,37 @@ function getChampions() {
   const svA = sv.away == null || sv.away === '' ? null : +sv.away;
   if (svH === null || svA === null || svH === svA) return null;
 
-  const avcSeeds = getBracketSeeds('AVC', pools, schedule, gameScores);
-  const nvcSeeds = getBracketSeeds('NVC', pools, schedule, gameScores);
-
-  // Resolve div final winner/loser
-  const getDivFinalists = (div, seeds) => {
-    const s = bracketScores[div + '-final'] || {};
+  const sfWinner = (div, sfNum) => {
+    const seeds = getBracketSeeds(div, pools, schedule, gameScores);
+    const bid = div + '-sf' + sfNum;
+    const s = bracketScores[bid] || {};
     const h = s.home == null || s.home === '' ? null : +s.home;
     const a = s.away == null || s.away === '' ? null : +s.away;
     if (h === null || a === null || h === a) return null;
-    // final is seeds[0] or winner of sf vs seeds[1] or winner of sf — just use name resolution
-    const winner = h > a ? (seeds[0] || null) : (seeds[1] || null);
-    const runner = h > a ? (seeds[1] || null) : (seeds[0] || null);
-    return { winner, runner };
+    if (sfNum === 1) return h > a ? seeds[0] : seeds[3];
+    return h > a ? seeds[1] : seeds[2];
   };
 
-  const avcFinal = getDivFinalists('AVC', avcSeeds);
-  const nvcFinal = getDivFinalists('NVC', nvcSeeds);
+  const divFinalResult = (div) => {
+    const sf1W = sfWinner(div, 1);
+    const sf2W = sfWinner(div, 2);
+    const fs = bracketScores[div + '-final'] || {};
+    const fh = fs.home == null || fs.home === '' ? null : +fs.home;
+    const fa = fs.away == null || fs.away === '' ? null : +fs.away;
+    if (fh === null || fa === null || fh === fa) return { winner: null, runner: null };
+    return { winner: fh > fa ? sf1W : sf2W, runner: fh > fa ? sf2W : sf1W };
+  };
 
-  // SV: home slot = AVC champ, away slot = NVC champ
-  const svWinner = svH > svA ? 'AVC' : 'NVC';
-  const avcChamp = avcFinal?.winner || { name: 'AVC Champion', captain: '—' };
-  const nvcChamp = nvcFinal?.winner || { name: 'NVC Champion', captain: '—' };
-  const avcRunner = avcFinal?.runner || { name: 'AVC Runner-up', captain: '—' };
-  const nvcRunner = nvcFinal?.runner || { name: 'NVC Runner-up', captain: '—' };
+  const avc = divFinalResult('AVC');
+  const nvc = divFinalResult('NVC');
+  const avcChamp = avc.winner || { name: 'AVC Champion', captain: '—' };
+  const nvcChamp = nvc.winner || { name: 'NVC Champion', captain: '—' };
 
   return {
-    champion:    svWinner === 'AVC' ? avcChamp : nvcChamp,
-    runnerUp:    svWinner === 'AVC' ? nvcChamp : avcChamp,
-    divRunner1:  avcRunner,
-    divRunner2:  nvcRunner,
+    champion:  svH > svA ? avcChamp : nvcChamp,
+    runnerUp:  svH > svA ? nvcChamp : avcChamp,
+    divRunner1: avc.runner || { name: 'AVC Runner-up', captain: '—' },
+    divRunner2: nvc.runner || { name: 'NVC Runner-up', captain: '—' },
   };
 }
 
