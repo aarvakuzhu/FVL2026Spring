@@ -1171,44 +1171,65 @@ function checkChampionButton() {
 }
 
 function trophy(rank) {
-  const t = { 1:'🥇', 2:'🥈', 3:'🥉', 4:'🏅' };
-  return t[rank] || '🏅';
+  return ['🥇','🥈','🥉','🥉'][rank-1] || '🏅';
 }
 
-function champCard(rank, title, subtitle, team) {
-  if (!team) return '';
-  const photo = CAPTAIN_PHOTOS[team.captain] || '';
-  const gradients = [
-    'linear-gradient(135deg,#1a0a00,#3d1f00)',
-    'linear-gradient(135deg,#0a0a1a,#1a1a3d)',
-    'linear-gradient(135deg,#001a0a,#003d1f)',
-    'linear-gradient(135deg,#0a001a,#1f003d)',
-  ];
-  const borders = ['#ffd700','#c0c0c0','#cd7f32','#a855f7'];
-  const glows   = ['rgba(255,215,0,.5)','rgba(192,192,192,.4)','rgba(205,127,50,.4)','rgba(168,85,247,.4)'];
-  const crowns  = ['👑','🥈','🥉','🌟'];
-  const delay   = (rank - 1) * 180;
+function avatarHtml(captain, size, border, glow) {
+  const url = CAPTAIN_PHOTOS[captain] || '';
+  const initial = (captain||'?').charAt(0).toUpperCase();
+  const img = url
+    ? `<img src="${url}" alt="${captain}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:3px solid ${border};box-shadow:0 0 24px ${glow};display:block" onerror="this.outerHTML='<div style=\\'width:${size}px;height:${size}px;border-radius:50%;background:rgba(255,255,255,.12);border:3px solid ${border};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.38)}px;font-weight:900;color:${border}\\'>${initial}</div>'">`
+    : `<div style="width:${size}px;height:${size}px;border-radius:50%;background:rgba(255,255,255,.12);border:3px solid ${border};box-shadow:0 0 24px ${glow};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*.38)}px;font-weight:900;color:${border}">${initial}</div>`;
+  return img;
+}
 
-  return `<div style="background:${gradients[rank-1]};border:2px solid ${borders[rank-1]};border-radius:24px;padding:20px;animation:fadeUp .6s ${delay}ms both,glow-pulse 3s ${delay}ms infinite;box-shadow:0 0 30px ${glows[rank-1]}">
-    <div style="display:flex;align-items:flex-start;gap:16px">
-      <!-- Avatar -->
+function champCard(rank, title, subtitle, team, opts={}) {
+  if (!team) return '';
+  const borders = ['#ffd700','#c0c0c0','#cd7f32','#cd7f32'];
+  const glows   = ['rgba(255,215,0,.6)','rgba(192,192,192,.5)','rgba(205,127,50,.5)','rgba(205,127,50,.5)'];
+  const gradients = [
+    'linear-gradient(160deg,#1f1000,#3d2200)',
+    'linear-gradient(160deg,#0d0d1f,#1a1a40)',
+    'linear-gradient(160deg,#1a0d00,#2e1a00)',
+    'linear-gradient(160deg,#1a0d00,#2e1a00)',
+  ];
+  const border = opts.border || borders[rank-1];
+  const glow   = opts.glow   || glows[rank-1];
+  const grad   = opts.grad   || gradients[rank-1];
+  const delay  = opts.delay  !== undefined ? opts.delay : (rank-1)*180;
+  const photoSize = rank === 1 ? 120 : rank === 2 ? 90 : 72;
+  const nameSize  = rank === 1 ? 30 : rank === 2 ? 24 : 20;
+  const crownSize = rank === 1 ? 36 : rank === 2 ? 28 : 22;
+  const crownEmoji = rank === 1 ? '👑' : rank === 2 ? '🥈' : '🥉';
+
+  return `<div style="background:${grad};border:2px solid ${border};border-radius:22px;padding:${rank===1?'24px':'18px'};animation:fadeUp .6s ${delay}ms both,glow-pulse 3s ${delay}ms infinite;box-shadow:0 0 40px ${glow},0 0 80px ${glow.replace('.6','.2').replace('.5','.15')}">
+    ${rank===1 ? `
+    <!-- Champion of Champions — centred portrait layout -->
+    <div style="text-align:center">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:${border};opacity:.85;margin-bottom:12px">${title}</div>
+      <div style="position:relative;display:inline-block;margin-bottom:14px">
+        ${avatarHtml(team.captain, photoSize, border, glow)}
+        <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:${crownSize}px;animation:crown-drop .8s ${delay+200}ms both;filter:drop-shadow(0 0 8px ${border})">${crownEmoji}</div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;letter-spacing:.02em;background:linear-gradient(135deg,${border},#fff,${border});-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;margin-bottom:6px">${team.name}</div>
+      <div style="font-size:15px;color:rgba(255,255,255,.75);font-weight:700;margin-bottom:4px">${team.captain}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase">${subtitle}</div>
+      <div style="font-size:36px;margin-top:10px;animation:bounce 1.8s ${delay}ms infinite">🏆</div>
+    </div>` : `
+    <!-- Runner-up — horizontal layout -->
+    <div style="display:flex;align-items:center;gap:14px">
       <div style="position:relative;flex-shrink:0">
-        ${photo
-          ? `<img src="${photo}" alt="${team.captain}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid ${borders[rank-1]};box-shadow:0 0 20px ${glows[rank-1]}" onerror="this.style.display='none'">`
-          : `<div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);border:3px solid ${borders[rank-1]};display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:${borders[rank-1]}">${team.captain.charAt(0)}</div>`
-        }
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:22px;animation:crown-drop .8s ${delay+200}ms both">${crowns[rank-1]}</div>
+        ${avatarHtml(team.captain, photoSize, border, glow)}
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:${crownSize}px;animation:crown-drop .8s ${delay+200}ms both">${crownEmoji}</div>
       </div>
-      <!-- Info -->
       <div style="flex:1;min-width:0">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${borders[rank-1]};opacity:.9;margin-bottom:3px">${title}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;letter-spacing:.02em;color:#fff;line-height:1.1;margin-bottom:4px">${team.name}</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);font-weight:600">${team.captain}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(255,255,255,.35);margin-top:4px;letter-spacing:.06em;text-transform:uppercase">${subtitle}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${border};opacity:.85;margin-bottom:2px">${title}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:${nameSize}px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:3px">${team.name}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.6);font-weight:600">${team.captain}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(255,255,255,.3);margin-top:3px;letter-spacing:.06em;text-transform:uppercase">${subtitle}</div>
       </div>
-      <!-- Trophy -->
-      <div style="font-size:40px;flex-shrink:0;animation:bounce 2s ${delay}ms infinite">${trophy(rank)}</div>
-    </div>
+      <div style="font-size:${rank===2?32:26}px;flex-shrink:0;animation:bounce 2s ${delay}ms infinite">${trophy(rank)}</div>
+    </div>`}
   </div>`;
 }
 
@@ -1216,11 +1237,14 @@ function openCeremony() {
   const ch = getChampions();
   if (!ch) { toast('Complete the SuperVolley Final to reveal champions'); return; }
 
+  // Ranks 3 & 4 are equal — rendered side by side
+  const runner3 = champCard(3, 'FVL Runner-Up', 'AVC Division Final', ch.divRunner1, {delay:360});
+  const runner4 = champCard(3, 'FVL Runner-Up', 'NVC Division Final', ch.divRunner2, {delay:480});
+
   document.getElementById('ceremonyCards').innerHTML = [
     champCard(1, 'FVL Champion of Champions', 'SuperVolley Winner', ch.champion),
     champCard(2, 'FVL Champion', 'SuperVolley Runner-Up', ch.runnerUp),
-    champCard(3, 'FVL Runner-Up', 'AVC Division Final Runner', ch.divRunner1),
-    champCard(4, 'FVL Runner-Up', 'NVC Division Final Runner', ch.divRunner2),
+    `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${runner3}${runner4}</div>`,
   ].join('');
 
   document.getElementById('ceremonyOverlay').style.display = 'block';
