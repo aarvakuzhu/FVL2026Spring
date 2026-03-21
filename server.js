@@ -40,7 +40,8 @@ function defaultState() {
 const sseClients = new Set();
 
 function broadcastUpdate(state) {
-  const data = JSON.stringify({ type: 'state', state, ts: Date.now() });
+  const { _token, ...publicState } = state;
+  const data = JSON.stringify({ type: 'state', state: publicState, ts: Date.now() });
   for (const res of sseClients) {
     try { res.write(`data: ${data}\n\n`); }
     catch { sseClients.delete(res); }
@@ -48,15 +49,15 @@ function broadcastUpdate(state) {
 }
 
 // ── AUTH MIDDLEWARE ────────────────────────────────────
-const sessions = new Map();
+// Sessions persist in state.json — survives Render free-tier restarts
+function getStoredToken() {
+  try { return loadState()._token || null; } catch { return null; }
+}
 
 function authMiddleware(req, res, next) {
   const token = req.headers['x-director-token'] || req.query.token;
-  if (token && sessions.has(token)) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Unauthorized' });
-  }
+  if (token && token === getStoredToken()) next();
+  else res.status(401).json({ error: 'Unauthorized' });
 }
 
 // ── ROUTES ─────────────────────────────────────────────
@@ -81,7 +82,10 @@ app.post('/api/login', (req, res) => {
   const { password } = req.body;
   if (password === DIRECTOR_PASSWORD) {
     const token = crypto.randomBytes(32).toString('hex');
-    sessions.set(token, { createdAt: Date.now() });
+    // Persist token so it survives server restarts
+    const state = loadState();
+    state._token = token;
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
     res.json({ token });
   } else {
     res.status(401).json({ error: 'Wrong password' });
@@ -91,9 +95,10 @@ app.post('/api/login', (req, res) => {
 // Ping endpoint — used by UptimeRobot to keep the app alive on Render free tier
 app.get('/ping', (req, res) => res.json({ ok: true, ts: Date.now() }));
 
-// Get state (public — anyone can read)
+// Get state (public — anyone can read, _token is stripped)
 app.get('/api/state', (req, res) => {
-  res.json(loadState());
+  const { _token, ...publicState } = loadState();
+  res.json(publicState);
 });
 
 // SSE stream (public — anyone can subscribe)
@@ -105,8 +110,8 @@ app.get('/api/stream', (req, res) => {
   res.flushHeaders();
 
   // Send current state immediately
-  const state = loadState();
-  res.write(`data: ${JSON.stringify({ type: 'state', state, ts: Date.now() })}\n\n`);
+  const { _token, ...publicState } = loadState();
+  res.write(`data: ${JSON.stringify({ type: 'state', state: publicState, ts: Date.now() })}\n\n`);
 
   // Heartbeat every 20s
   const hb = setInterval(() => {
