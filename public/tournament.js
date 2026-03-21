@@ -30,6 +30,7 @@ function captainAvatar(name, size=32) {
 }
 
 
+const NVC_CAPTAINS = [
   'Ritesh Gupta','Keyur Patel','Pratap','Bharath Muttavarapu',
   'Surendra Kanna','Sonu (Kapil)','Govardhana Peruri','Murali Atkuri'
 ];
