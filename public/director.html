@@ -771,10 +771,22 @@ function onScoreChange(gameId, side, val) {
 function onBracketScoreChange(bid, side, val) {
   if (!bracketScores[bid]) bracketScores[bid] = {home:'',away:''};
   bracketScores[bid][side] = val===''?'':parseInt(val)||0;
-  // Re-render full bracket so SF winners carry into final and division winners into SV
-  renderBracket();
+  updateBracketRow(bid);
+  // Re-render bracket after a delay so SF winners carry into final
+  // but input focus is not disrupted mid-type
+  clearTimeout(_bracketRenderTimer);
+  _bracketRenderTimer = setTimeout(() => {
+    const active = document.activeElement;
+    renderBracket();
+    // Restore focus if it was inside the bracket
+    if (active && active.dataset.bid) {
+      const el = document.querySelector(`input[data-bid="${active.dataset.bid}"][data-side="${active.dataset.side}"]`);
+      if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+    }
+  }, 800);
   patchScores();
 }
+let _bracketRenderTimer = null;
 function updateBracketRow(bid) {
   const el = document.getElementById('brow-'+bid);
   if (!el) return;
@@ -834,8 +846,8 @@ function renderBracket() {
             <div class="bg-team-row away-team ${aCls}"><div class="bg-seed">${away?away.seed:'?'}</div><div class="bg-team-info"><div class="bg-team-name">${away?away.name:'TBD'}${away?mkBadge(away.isAuto,away.isWC):''}</div><div class="bg-team-cap">${away?away.captain:''}</div></div></div>
           </div>
           <div class="bg-score-col">
-            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.home||''}" oninput="onBracketScoreChange('${bid}','home',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val home-score ${hCls}"></div>
-            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.away||''}" oninput="onBracketScoreChange('${bid}','away',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val away-score ${aCls}"></div>
+            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.home||''}" data-bid="${bid}" data-side="home" oninput="onBracketScoreChange('${bid}','home',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val home-score ${hCls}"></div>
+            <div class="bg-score-entry"><input type="number" min="0" max="25" placeholder="–" value="${s.away||''}" data-bid="${bid}" data-side="away" oninput="onBracketScoreChange('${bid}','away',this.value)" style="width:36px;font-size:13px;padding:4px 5px" class="bg-score-val away-score ${aCls}"></div>
           </div>
         </div>
         <div class="bg-meta"><span class="bg-tag">${tag}</span><div style="display:flex;align-items:center;gap:6px"><span class="bg-diff${diff?' has':''}">${diff?'+'+diff:''}</span><span class="bg-time-court">${timeStr(tVal)} · C${c}</span></div></div>
@@ -898,9 +910,9 @@ function renderBracket() {
     <div class="sv-bottom">
       <div class="sv-score-inputs">
         <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-right:4px">AVC</span>
-        <input type="number" min="0" max="25" placeholder="–" value="${sv.home||''}" oninput="onBracketScoreChange('supervolley','home',this.value)">
+        <input type="number" min="0" max="25" placeholder="–" value="${sv.home||''}" data-bid="supervolley" data-side="home" oninput="onBracketScoreChange('supervolley','home',this.value)">
         <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);padding:0 4px">:</span>
-        <input type="number" min="0" max="25" placeholder="–" value="${sv.away||''}" oninput="onBracketScoreChange('supervolley','away',this.value)">
+        <input type="number" min="0" max="25" placeholder="–" value="${sv.away||''}" data-bid="supervolley" data-side="away" oninput="onBracketScoreChange('supervolley','away',this.value)">
         <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-left:4px">NVC</span>
       </div>
       <span class="sv-diff${svDiff?' has':''}">${svDiff?'+'+svDiff+' pts':''}</span>
