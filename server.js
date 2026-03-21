@@ -124,18 +124,44 @@ app.get('/api/stream', (req, res) => {
 });
 
 // Save full state (director only)
+// Server always preserves _token from disk.
+// If schedule is locked on disk, client cannot unlock it via POST — only /api/unlock can.
 app.post('/api/state', authMiddleware, (req, res) => {
-  const state = { ...req.body, lastUpdated: new Date().toISOString() };
+  const onDisk = loadState();
+  const incoming = req.body;
+
+  // Never let client downgrade a locked schedule
+  const locked = onDisk.locked === true ? true : (incoming.locked === true);
+
+  const state = {
+    ...incoming,
+    locked,
+    _token: onDisk._token,           // always preserve token
+    lastUpdated: new Date().toISOString()
+  };
   saveState(state);
   res.json({ ok: true });
 });
 
-// Patch scores only (director only) — lightweight update
+// Patch scores only (director only) — lightweight, never touches lock or token
 app.patch('/api/scores', authMiddleware, (req, res) => {
   const state = loadState();
   const { gameScores, bracketScores } = req.body;
   if (gameScores) state.gameScores = { ...state.gameScores, ...gameScores };
   if (bracketScores) state.bracketScores = { ...state.bracketScores, ...bracketScores };
+  state.lastUpdated = new Date().toISOString();
+  saveState(state);
+  res.json({ ok: true });
+});
+
+// Unlock schedule — requires password re-verification server-side
+app.post('/api/unlock', authMiddleware, (req, res) => {
+  const { password } = req.body;
+  if (password !== DIRECTOR_PASSWORD) {
+    return res.status(401).json({ error: 'Wrong password' });
+  }
+  const state = loadState();
+  state.locked = false;
   state.lastUpdated = new Date().toISOString();
   saveState(state);
   res.json({ ok: true });

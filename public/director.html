@@ -913,15 +913,17 @@ async function doUnlock() {
   const errEl = document.getElementById('unlockError');
   if (!pw) { errEl.textContent = 'Enter the password'; return; }
   try {
-    const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({password:pw}) });
+    const r = await fetch('/api/unlock', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'x-director-token': directorToken },
+      body: JSON.stringify({ password: pw })
+    });
     if (r.ok) {
-      // Password correct — unlock
       locked = false;
       updateLockUI();
       closeConfirm('unlockModal');
       document.getElementById('unlockInput').value = '';
-      debouncedSave();
-      // Now open the intended reset dialog
+      // Open intended reset dialog
       if (_pendingResetAfterUnlock === 'full') {
         document.getElementById('confirmReset').classList.add('open');
       } else if (_pendingResetAfterUnlock === 'scores') {
