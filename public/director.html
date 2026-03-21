@@ -172,6 +172,7 @@ body.light .btn-danger:hover{background:#fff0f0;border-color:#c02020}
     <div id="scheduleView"></div>
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="goTo(3)">View Standings →</button>
+      <button class="btn btn-ghost" onclick="exportCSV()" title="Download printable backup">⬇ Export CSV</button>
       <button class="btn btn-danger" onclick="confirmResetScores()">↺ Reset Scores</button>
     </div>
   </div>
@@ -919,6 +920,144 @@ document.addEventListener('keydown',e=>{
     closeConfirm('unlockModal');
   }
 });
+
+// ── EXPORT CSV ────────────────────────────────────────
+function exportCSV() {
+  if (!schedule.length) { toast('No schedule to export'); return; }
+
+  const esc = v => {
+    const s = String(v == null ? '' : v);
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? '"' + s.replace(/"/g, '""') + '"'
+      : s;
+  };
+
+  const phaseLabel = p => p === 'p1' ? 'Phase 1 – Pool Play' : p === 'p2' ? 'Phase 2 – Wildcard' : p === 'bracket' ? 'Phase 3 – Bracket' : 'SuperVolley Final';
+
+  const rows = [];
+
+  // ── Header ──
+  rows.push([
+    'Phase', 'Time', 'Court', 'Pool / Division',
+    'Home Team', 'Home Captain',
+    'Away Team', 'Away Captain',
+    'Umpire',
+    'Home Score', 'Away Score', 'Point Differential', 'Result'
+  ]);
+
+  // ── Phase 1 & 2 games ──
+  const sorted = [...schedule].filter(g => !g.isBreak).sort((a, b) => a.time - b.time || a.court - b.court);
+  sorted.forEach(g => {
+    const s = gameScores[g.id] || {};
+    const hS = s.home === '' || s.home == null ? '' : +s.home;
+    const aS = s.away === '' || s.away == null ? '' : +s.away;
+    const diff = hS !== '' && aS !== '' && hS !== aS ? Math.abs(hS - aS) : '';
+    const result = hS !== '' && aS !== '' && hS !== aS
+      ? (hS > aS ? g.home + ' win' : g.away + ' win')
+      : hS !== '' && aS !== '' && hS === aS ? 'Draw' : 'Pending';
+    rows.push([
+      phaseLabel(g.phase),
+      timeStr(g.time),
+      'Court ' + g.court,
+      g.tag,
+      g.home, g.homeCap,
+      g.away, g.awayCap,
+      g.umpire || '—',
+      hS, aS, diff !== '' ? (hS > aS ? '+' : '-') + diff : '',
+      result
+    ]);
+  });
+
+  // ── Spacer ──
+  rows.push([]);
+  rows.push(['── BRACKET ─────────────────────────────────────────────────────']);
+  rows.push([]);
+
+  // ── Bracket games ──
+  ['AVC', 'NVC'].forEach(div => {
+    const seeds = getBracketSeeds(div, pools, schedule, gameScores);
+    const court = div === 'AVC' ? 1 : 2;
+    const t3 = 420;
+    const bGames = [
+      { bid: div + '-sf1', home: seeds[0], away: seeds[3], tag: div + ' Semifinal 1', tVal: t3,    round: 'Phase 3 – Semifinal 1' },
+      { bid: div + '-sf2', home: seeds[1], away: seeds[2], tag: div + ' Semifinal 2', tVal: t3+25, round: 'Phase 3 – Semifinal 2' },
+      { bid: div + '-final', home: null,   away: null,     tag: div + ' Final',       tVal: t3+50, round: 'Phase 3 – Division Final' },
+    ];
+    bGames.forEach(bg => {
+      const s = bracketScores[bg.bid] || {};
+      const hS = s.home === '' || s.home == null ? '' : +s.home;
+      const aS = s.away === '' || s.away == null ? '' : +s.away;
+      const diff = hS !== '' && aS !== '' && hS !== aS ? Math.abs(hS - aS) : '';
+      const homeName = bg.home ? bg.home.name : 'TBD';
+      const homeCap  = bg.home ? bg.home.captain : '';
+      const awayName = bg.away ? bg.away.name : 'TBD';
+      const awayCap  = bg.away ? bg.away.captain : '';
+      const result = hS !== '' && aS !== '' && hS !== aS
+        ? (hS > aS ? homeName + ' win' : awayName + ' win') : 'Pending';
+      rows.push([
+        bg.round,
+        timeStr(bg.tVal),
+        'Court ' + court,
+        bg.tag,
+        homeName, homeCap,
+        awayName, awayCap,
+        '—',
+        hS, aS, diff !== '' ? (hS > aS ? '+' : '-') + diff : '',
+        result
+      ]);
+    });
+  });
+
+  // ── SuperVolley Final ──
+  rows.push([]);
+  const sv = bracketScores['supervolley'] || {};
+  const shS = sv.home === '' || sv.home == null ? '' : +sv.home;
+  const saS = sv.away === '' || sv.away == null ? '' : +sv.away;
+  const svDiff = shS !== '' && saS !== '' && shS !== saS ? Math.abs(shS - saS) : '';
+  const svResult = shS !== '' && saS !== '' && shS !== saS
+    ? (shS > saS ? 'AVC Champion win' : 'NVC Champion win') : 'Pending';
+  rows.push([
+    'SuperVolley Final', timeStr(495), 'Centre Court', 'AVC vs NVC',
+    'AVC Champion', '',
+    'NVC Champion', '',
+    '—',
+    shS, saS, svDiff !== '' ? (shS > saS ? '+' : '-') + svDiff : '',
+    svResult
+  ]);
+
+  // ── Standings summary ──
+  rows.push([]);
+  rows.push(['── POOL STANDINGS ───────────────────────────────────────────────']);
+  rows.push([]);
+  rows.push(['Pool', 'Rank', 'Team', 'Captain', 'W', 'L', 'PF', 'PA', 'Diff']);
+  if (pools) {
+    const poolDefs = [
+      { teams: pools.AVC.Fowler, tag: 'Fowler · AVC', label: 'Fowler (AVC)' },
+      { teams: pools.AVC.Central, tag: 'Central · AVC', label: 'Central (AVC)' },
+      { teams: pools.NVC.Dobbs, tag: 'Dobbs · NVC', label: 'Dobbs (NVC)' },
+      { teams: pools.NVC.Extreme, tag: 'Extreme · NVC', label: 'Extreme (NVC)' },
+    ];
+    poolDefs.forEach(pd => {
+      const st = computePoolStandings(pd.teams, pd.tag, schedule, gameScores);
+      st.forEach((t, i) => {
+        rows.push([pd.label, i + 1, t.name, t.cap, t.w, t.l, t.pf, t.pa, t.pf - t.pa]);
+      });
+      rows.push([]);
+    });
+  }
+
+  // ── Build CSV ──
+  const csv = rows.map(r => r.map(esc).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', 'h');
+  a.href = url;
+  a.download = `FVL_Spring2026_SuperVolley_${ts}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV exported ✓');
+}
 
 // ── THEME ─────────────────────────────────────────────
 function toggleTheme(){
