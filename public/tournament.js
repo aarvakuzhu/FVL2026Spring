@@ -26,9 +26,8 @@ const CAPTAIN_PHOTOS = {
 function captainAvatar(name, size=32) {
   const url = CAPTAIN_PHOTOS[name];
   const initial = (name||'?').charAt(0).toUpperCase();
-  const fallback = `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rim2,rgba(255,255,255,.1));flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:${Math.round(size*.38)}px;font-weight:700;color:var(--text3,#aaa)">${initial}</div>`;
-  if (!url) return fallback;
-  return `<img src="${url}" alt="${name}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0;background:rgba(128,128,128,.2)" onerror="this.outerHTML='${fallback.replace(/'/g,"&apos;")}'" loading="lazy">`;
+  if (!url) return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:var(--rim2,rgba(128,128,128,.2));flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:${Math.round(size*.38)}px;font-weight:700;color:var(--text3,#999)">${initial}</div>`;
+  return `<img src="${url}" alt="${name}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.cssText='width:${size}px;height:${size}px;border-radius:50%;background:rgba(128,128,128,.2);display:inline-flex;align-items:center;justify-content:center';this.src='';this.alt='${initial}'">`;
 }
 
 
