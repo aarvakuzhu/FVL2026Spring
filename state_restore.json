@@ -1,0 +1,576 @@
+{
+  "_id": "tournament",
+  "teams": [
+    {
+      "name": "Vegas Volleys",
+      "captain": "Divyanshu Ranjan",
+      "div": "AVC"
+    },
+    {
+      "name": "Everest Smashers",
+      "captain": "Anil Reddy Gurrala",
+      "div": "AVC"
+    },
+    {
+      "name": "6 Minars",
+      "captain": "Bharath Muttavarapu",
+      "div": "NVC"
+    },
+    {
+      "name": "Gateway Defenders",
+      "captain": "Pratap",
+      "div": "NVC"
+    },
+    {
+      "name": "Disney World Warriors",
+      "captain": "Santosh Nareddy",
+      "div": "AVC"
+    },
+    {
+      "name": "Lal Kile ki Sena",
+      "captain": "Sonu (Kapil)",
+      "div": "NVC"
+    },
+    {
+      "name": "Eiffel Tower of Power",
+      "captain": "Ishant Mehndiratta",
+      "div": "AVC"
+    },
+    {
+      "name": "Coca-Cola Fizz Spikers",
+      "captain": "Uday Battineni",
+      "div": "AVC"
+    },
+    {
+      "name": "Varanasi Volleys",
+      "captain": "Ritesh Gupta",
+      "div": "NVC"
+    },
+    {
+      "name": "Fowler Fury",
+      "captain": "Ronak Bathani",
+      "div": "AVC"
+    },
+    {
+      "name": "Alps Attackers",
+      "captain": "Naveen Kumar",
+      "div": "AVC"
+    },
+    {
+      "name": "The Great Wall of De-Fence",
+      "captain": "Rakesh Kumar",
+      "div": "AVC"
+    },
+    {
+      "name": "Terra Cotta Warriors",
+      "captain": "Surendra Kanna",
+      "div": "NVC"
+    },
+    {
+      "name": "The Emerald Defenders",
+      "captain": "Keyur Patel",
+      "div": "NVC"
+    },
+    {
+      "name": "Set-lanta",
+      "captain": "Govardhana Peruri",
+      "div": "NVC"
+    },
+    {
+      "name": "Mansarovar Thunder Spike",
+      "captain": "Murali Atkuri",
+      "div": "NVC"
+    }
+  ],
+  "pools": {
+    "AVC": {
+      "Fowler": [
+        {
+          "name": "Eiffel Tower of Power",
+          "captain": "Ishant Mehndiratta",
+          "div": "AVC"
+        },
+        {
+          "name": "Vegas Volleys",
+          "captain": "Divyanshu Ranjan",
+          "div": "AVC"
+        },
+        {
+          "name": "The Great Wall of De-Fence",
+          "captain": "Rakesh Kumar",
+          "div": "AVC"
+        },
+        {
+          "name": "Fowler Fury",
+          "captain": "Ronak Bathani",
+          "div": "AVC"
+        }
+      ],
+      "Central": [
+        {
+          "name": "Everest Smashers",
+          "captain": "Anil Reddy Gurrala",
+          "div": "AVC"
+        },
+        {
+          "name": "Alps Attackers",
+          "captain": "Naveen Kumar",
+          "div": "AVC"
+        },
+        {
+          "name": "Disney World Warriors",
+          "captain": "Santosh Nareddy",
+          "div": "AVC"
+        },
+        {
+          "name": "Coca-Cola Fizz Spikers",
+          "captain": "Uday Battineni",
+          "div": "AVC"
+        }
+      ]
+    },
+    "NVC": {
+      "Dobbs": [
+        {
+          "name": "Lal Kile ki Sena",
+          "captain": "Sonu (Kapil)",
+          "div": "NVC"
+        },
+        {
+          "name": "Mansarovar Thunder Spike",
+          "captain": "Murali Atkuri",
+          "div": "NVC"
+        },
+        {
+          "name": "Varanasi Volleys",
+          "captain": "Ritesh Gupta",
+          "div": "NVC"
+        },
+        {
+          "name": "Set-lanta",
+          "captain": "Govardhana Peruri",
+          "div": "NVC"
+        }
+      ],
+      "Extreme": [
+        {
+          "name": "The Emerald Defenders",
+          "captain": "Keyur Patel",
+          "div": "NVC"
+        },
+        {
+          "name": "Gateway Defenders",
+          "captain": "Pratap",
+          "div": "NVC"
+        },
+        {
+          "name": "6 Minars",
+          "captain": "Bharath Muttavarapu",
+          "div": "NVC"
+        },
+        {
+          "name": "Terra Cotta Warriors",
+          "captain": "Surendra Kanna",
+          "div": "NVC"
+        }
+      ]
+    }
+  },
+  "schedule": [
+    {
+      "isBreak": true,
+      "time": 150,
+      "phase": "break"
+    },
+    {
+      "id": "g1",
+      "time": 0,
+      "court": 1,
+      "home": "Eiffel Tower of Power",
+      "homeCap": "Ishant Mehndiratta",
+      "away": "Vegas Volleys",
+      "awayCap": "Divyanshu Ranjan",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Ronak Bathani"
+    },
+    {
+      "id": "g2",
+      "time": 0,
+      "court": 2,
+      "home": "Everest Smashers",
+      "homeCap": "Anil Reddy Gurrala",
+      "away": "Alps Attackers",
+      "awayCap": "Naveen Kumar",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Uday Battineni"
+    },
+    {
+      "id": "g3",
+      "time": 25,
+      "court": 1,
+      "home": "Lal Kile ki Sena",
+      "homeCap": "Sonu (Kapil)",
+      "away": "Mansarovar Thunder Spike",
+      "awayCap": "Murali Atkuri",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Surendra Kanna"
+    },
+    {
+      "id": "g4",
+      "time": 25,
+      "court": 2,
+      "home": "The Emerald Defenders",
+      "homeCap": "Keyur Patel",
+      "away": "Gateway Defenders",
+      "awayCap": "Pratap",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Bharath Muttavarapu"
+    },
+    {
+      "id": "g5",
+      "time": 50,
+      "court": 1,
+      "home": "Disney World Warriors",
+      "homeCap": "Santosh Nareddy",
+      "away": "Coca-Cola Fizz Spikers",
+      "awayCap": "Uday Battineni",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Ishant Mehndiratta"
+    },
+    {
+      "id": "g6",
+      "time": 50,
+      "court": 2,
+      "home": "The Great Wall of De-Fence",
+      "homeCap": "Rakesh Kumar",
+      "away": "Fowler Fury",
+      "awayCap": "Ronak Bathani",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Naveen Kumar"
+    },
+    {
+      "id": "g7",
+      "time": 75,
+      "court": 1,
+      "home": "6 Minars",
+      "homeCap": "Bharath Muttavarapu",
+      "away": "Terra Cotta Warriors",
+      "awayCap": "Surendra Kanna",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Pratap"
+    },
+    {
+      "id": "g8",
+      "time": 75,
+      "court": 2,
+      "home": "Varanasi Volleys",
+      "homeCap": "Ritesh Gupta",
+      "away": "Set-lanta",
+      "awayCap": "Govardhana Peruri",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Sonu (Kapil)"
+    },
+    {
+      "id": "g9",
+      "time": 100,
+      "court": 1,
+      "home": "Eiffel Tower of Power",
+      "homeCap": "Ishant Mehndiratta",
+      "away": "The Great Wall of De-Fence",
+      "awayCap": "Rakesh Kumar",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Divyanshu Ranjan"
+    },
+    {
+      "id": "g10",
+      "time": 100,
+      "court": 2,
+      "home": "Everest Smashers",
+      "homeCap": "Anil Reddy Gurrala",
+      "away": "Disney World Warriors",
+      "awayCap": "Santosh Nareddy",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Uday Battineni"
+    },
+    {
+      "id": "g11",
+      "time": 125,
+      "court": 1,
+      "home": "Lal Kile ki Sena",
+      "homeCap": "Sonu (Kapil)",
+      "away": "Varanasi Volleys",
+      "awayCap": "Ritesh Gupta",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Murali Atkuri"
+    },
+    {
+      "id": "g12",
+      "time": 125,
+      "court": 2,
+      "home": "The Emerald Defenders",
+      "homeCap": "Keyur Patel",
+      "away": "6 Minars",
+      "awayCap": "Bharath Muttavarapu",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Govardhana Peruri"
+    },
+    {
+      "id": "g13",
+      "time": 160,
+      "court": 1,
+      "home": "Alps Attackers",
+      "homeCap": "Naveen Kumar",
+      "away": "Coca-Cola Fizz Spikers",
+      "awayCap": "Uday Battineni",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Anil Reddy Gurrala"
+    },
+    {
+      "id": "g14",
+      "time": 160,
+      "court": 2,
+      "home": "Vegas Volleys",
+      "homeCap": "Divyanshu Ranjan",
+      "away": "Fowler Fury",
+      "awayCap": "Ronak Bathani",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Rakesh Kumar"
+    },
+    {
+      "id": "g15",
+      "time": 185,
+      "court": 1,
+      "home": "Gateway Defenders",
+      "homeCap": "Pratap",
+      "away": "Terra Cotta Warriors",
+      "awayCap": "Surendra Kanna",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Ritesh Gupta"
+    },
+    {
+      "id": "g16",
+      "time": 185,
+      "court": 2,
+      "home": "Mansarovar Thunder Spike",
+      "homeCap": "Murali Atkuri",
+      "away": "Set-lanta",
+      "awayCap": "Govardhana Peruri",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Keyur Patel"
+    },
+    {
+      "id": "g17",
+      "time": 210,
+      "court": 1,
+      "home": "Eiffel Tower of Power",
+      "homeCap": "Ishant Mehndiratta",
+      "away": "Fowler Fury",
+      "awayCap": "Ronak Bathani",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Santosh Nareddy"
+    },
+    {
+      "id": "g18",
+      "time": 210,
+      "court": 2,
+      "home": "Everest Smashers",
+      "homeCap": "Anil Reddy Gurrala",
+      "away": "Coca-Cola Fizz Spikers",
+      "awayCap": "Uday Battineni",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Divyanshu Ranjan"
+    },
+    {
+      "id": "g19",
+      "time": 235,
+      "court": 1,
+      "home": "Lal Kile ki Sena",
+      "homeCap": "Sonu (Kapil)",
+      "away": "Set-lanta",
+      "awayCap": "Govardhana Peruri",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Bharath Muttavarapu"
+    },
+    {
+      "id": "g20",
+      "time": 235,
+      "court": 2,
+      "home": "The Emerald Defenders",
+      "homeCap": "Keyur Patel",
+      "away": "Terra Cotta Warriors",
+      "awayCap": "Surendra Kanna",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Ritesh Gupta"
+    },
+    {
+      "id": "g21",
+      "time": 260,
+      "court": 1,
+      "home": "Alps Attackers",
+      "homeCap": "Naveen Kumar",
+      "away": "Disney World Warriors",
+      "awayCap": "Santosh Nareddy",
+      "tag": "Central \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Anil Reddy Gurrala"
+    },
+    {
+      "id": "g22",
+      "time": 260,
+      "court": 2,
+      "home": "Vegas Volleys",
+      "homeCap": "Divyanshu Ranjan",
+      "away": "The Great Wall of De-Fence",
+      "awayCap": "Rakesh Kumar",
+      "tag": "Fowler \u00b7 AVC",
+      "phase": "p1",
+      "umpire": "Ishant Mehndiratta"
+    },
+    {
+      "id": "g23",
+      "time": 285,
+      "court": 1,
+      "home": "Gateway Defenders",
+      "homeCap": "Pratap",
+      "away": "6 Minars",
+      "awayCap": "Bharath Muttavarapu",
+      "tag": "Extreme \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Surendra Kanna"
+    },
+    {
+      "id": "g24",
+      "time": 285,
+      "court": 2,
+      "home": "Mansarovar Thunder Spike",
+      "homeCap": "Murali Atkuri",
+      "away": "Varanasi Volleys",
+      "awayCap": "Ritesh Gupta",
+      "tag": "Dobbs \u00b7 NVC",
+      "phase": "p1",
+      "umpire": "Keyur Patel"
+    },
+    {
+      "id": "g25",
+      "time": 310,
+      "court": 1,
+      "home": "Fowler Fury",
+      "homeCap": "Ronak Bathani",
+      "away": "Everest Smashers",
+      "awayCap": "Anil Reddy Gurrala",
+      "tag": "Wildcard \u00b7 AVC",
+      "phase": "p2",
+      "umpire": "Divyanshu Ranjan"
+    },
+    {
+      "id": "g26",
+      "time": 310,
+      "court": 2,
+      "home": "Set-lanta",
+      "homeCap": "Govardhana Peruri",
+      "away": "Gateway Defenders",
+      "awayCap": "Pratap",
+      "tag": "Wildcard \u00b7 NVC",
+      "phase": "p2",
+      "umpire": "Ritesh Gupta"
+    },
+    {
+      "id": "g27",
+      "time": 335,
+      "court": 1,
+      "home": "Eiffel Tower of Power",
+      "homeCap": "Ishant Mehndiratta",
+      "away": "Disney World Warriors",
+      "awayCap": "Santosh Nareddy",
+      "tag": "Wildcard \u00b7 AVC",
+      "phase": "p2",
+      "umpire": "Ronak Bathani"
+    },
+    {
+      "id": "g28",
+      "time": 335,
+      "court": 2,
+      "home": "Lal Kile ki Sena",
+      "homeCap": "Sonu (Kapil)",
+      "away": "6 Minars",
+      "awayCap": "Bharath Muttavarapu",
+      "tag": "Wildcard \u00b7 NVC",
+      "phase": "p2",
+      "umpire": "Surendra Kanna"
+    },
+    {
+      "id": "g29",
+      "time": 360,
+      "court": 1,
+      "home": "The Great Wall of De-Fence",
+      "homeCap": "Rakesh Kumar",
+      "away": "Alps Attackers",
+      "awayCap": "Naveen Kumar",
+      "tag": "Wildcard \u00b7 AVC",
+      "phase": "p2",
+      "umpire": "Santosh Nareddy"
+    },
+    {
+      "id": "g30",
+      "time": 360,
+      "court": 2,
+      "home": "Varanasi Volleys",
+      "homeCap": "Ritesh Gupta",
+      "away": "The Emerald Defenders",
+      "awayCap": "Keyur Patel",
+      "tag": "Wildcard \u00b7 NVC",
+      "phase": "p2",
+      "umpire": "Govardhana Peruri"
+    },
+    {
+      "id": "g31",
+      "time": 385,
+      "court": 1,
+      "home": "Vegas Volleys",
+      "homeCap": "Divyanshu Ranjan",
+      "away": "Coca-Cola Fizz Spikers",
+      "awayCap": "Uday Battineni",
+      "tag": "Wildcard \u00b7 AVC",
+      "phase": "p2",
+      "umpire": "Rakesh Kumar"
+    },
+    {
+      "id": "g32",
+      "time": 385,
+      "court": 2,
+      "home": "Mansarovar Thunder Spike",
+      "homeCap": "Murali Atkuri",
+      "away": "Terra Cotta Warriors",
+      "awayCap": "Surendra Kanna",
+      "tag": "Wildcard \u00b7 NVC",
+      "phase": "p2",
+      "umpire": "Bharath Muttavarapu"
+    }
+  ],
+  "schedMode": "B",
+  "gameScores": {},
+  "bracketScores": {},
+  "locked": true,
+  "_token": "721b58f566fbfa03851d5acd184219bd270a4038fac34ddf51a74f18b3811b14",
+  "lastUpdated": "2026-03-27T17:00:40.925Z"
+}
