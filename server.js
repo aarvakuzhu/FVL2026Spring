@@ -186,7 +186,23 @@ app.post('/api/unlock', authMiddleware, async (req, res) => {
   res.json({ ok: true });
 });
 
-// ── START ──────────────────────────────────────────────
+// ONE-TIME RESTORE — removes itself after use
+app.post('/api/restore-wildcard', async (req, res) => {
+  const { secret } = req.body;
+  if (secret !== 'fvl2026restore') return res.status(401).json({ error: 'No' });
+  try {
+    const fs2 = require('fs');
+    const restorePath = path.join(__dirname, 'state_restore.json');
+    if (!fs2.existsSync(restorePath)) return res.status(404).json({ error: 'No restore file' });
+    const restored = JSON.parse(fs2.readFileSync(restorePath, 'utf8'));
+    const current = await loadState();
+    // Preserve live token
+    restored._token = current._token || restored._token;
+    restored.lastUpdated = new Date().toISOString();
+    await saveState(restored);
+    res.json({ ok: true, wildcardGames: restored.schedule.filter(g=>g.phase==='p2').length });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
 connectMongo().then(() => {
   app.listen(PORT, () => {
     console.log(`\n🏐 SuperVolley Tournament Server`);
