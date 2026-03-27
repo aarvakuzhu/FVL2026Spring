@@ -157,9 +157,12 @@ app.get('/api/stream', async (req, res) => {
 app.post('/api/state', authMiddleware, async (req, res) => {
   const onDisk = await loadState();
   const incoming = req.body;
-  // Server enforces: locked can only go true→false via /api/unlock
+  // locked: can only go true→false via /api/unlock
   const locked = onDisk.locked === true ? true : (incoming.locked === true);
-  const state = { ...incoming, locked, _token: onDisk._token, lastUpdated: new Date().toISOString() };
+  // If locked, schedule and pools are immutable — ignore whatever client sends
+  const schedule = onDisk.locked === true ? onDisk.schedule : (incoming.schedule || onDisk.schedule);
+  const pools    = onDisk.locked === true ? onDisk.pools    : (incoming.pools    || onDisk.pools);
+  const state = { ...incoming, schedule, pools, locked, _token: onDisk._token, lastUpdated: new Date().toISOString() };
   await saveState(state);
   res.json({ ok: true });
 });
@@ -186,23 +189,6 @@ app.post('/api/unlock', authMiddleware, async (req, res) => {
   res.json({ ok: true });
 });
 
-// ONE-TIME RESTORE — removes itself after use
-app.post('/api/restore-wildcard', async (req, res) => {
-  const { secret } = req.body;
-  if (secret !== 'fvl2026restore') return res.status(401).json({ error: 'No' });
-  try {
-    const fs2 = require('fs');
-    const restorePath = path.join(__dirname, 'state_restore.json');
-    if (!fs2.existsSync(restorePath)) return res.status(404).json({ error: 'No restore file' });
-    const restored = JSON.parse(fs2.readFileSync(restorePath, 'utf8'));
-    const current = await loadState();
-    // Preserve live token
-    restored._token = current._token || restored._token;
-    restored.lastUpdated = new Date().toISOString();
-    await saveState(restored);
-    res.json({ ok: true, wildcardGames: restored.schedule.filter(g=>g.phase==='p2').length });
-  } catch(e) { res.status(500).json({ error: e.message }); }
-});
 connectMongo().then(() => {
   app.listen(PORT, () => {
     console.log(`\n🏐 SuperVolley Tournament Server`);

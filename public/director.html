@@ -609,7 +609,10 @@ function goTo(step) {
     if (i===step) t.classList.add('active');
     else if (i<step) t.classList.add('done');
   });
-  if (step===2) buildSchedule();
+  if (step===2) {
+    if (!schedule.length) buildSchedule();  // only build fresh if no schedule loaded from server
+    else { renderSchedule(activeFilter); populateTeamFilter(); }
+  }
   if (step===3) { renderStandings(); renderWildcardStandings(); }
   if (step===4) renderBracket();
 }
@@ -652,8 +655,14 @@ function selectMode(m) {
   schedMode = m;
   document.getElementById('modeA').classList.toggle('selected', m==='A');
   document.getElementById('modeB').classList.toggle('selected', m==='B');
-  gameScores = {};
-  buildSchedule();
+  // Only rebuild if no schedule has been generated yet
+  // Once a schedule exists (especially if locked), never regenerate
+  if (!schedule.length) {
+    gameScores = {};
+    buildSchedule();
+  } else {
+    debouncedSave(); // just save the mode preference
+  }
 }
 function buildSchedule() {
   if (!pools) return;
